@@ -1,0 +1,1464 @@
+{
+    "version": "1.0.2",
+    "changelog": "v1.0.2 (2026-10-20)\n- Dodano nowe materiały izolacyjne (PROMATECT H, PROMATECT L).\n\nv1.0.1 (2026-09-28)\n- Aktualizacja testowa.\n\nv1.0.0 (2026-09-16)\n- Dodano wbudowaną bazę materiałów tłumiących.\n- Zaimplementowano bazę silników Cummins (w tym widma wydechowe).\n- Dodano parametry chłodnic Berry Radiateurs.",
+    "materials": {
+        "Tłumik SMAY TAP-11-AA (L=1000)": {
+            "name_en": "SMAY Silencer TAP-11-AA (L=1000)",
+            "desc_pl": "Tłumik z kulisami absorpcyjnymi (szer. prześwitu 50%)",
+            "desc_en": "Silencer with absorption splitters",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1000,
+            "spec": [
+                4,
+                4,
+                9,
+                19,
+                33,
+                33,
+                23,
+                15
+            ]
+        },
+        "Tłumik SMAY TAP-11-AR (L=1000)": {
+            "name_en": "SMAY Silencer TAP-11-AR (L=1000)",
+            "desc_pl": "Tłumik z kulisami rezonatorowymi",
+            "desc_en": "Silencer with resonator splitters",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1000,
+            "spec": [
+                4,
+                8,
+                10,
+                13,
+                21,
+                21,
+                15,
+                10
+            ]
+        },
+        "Tłumik SMAY TAP-15-AA (L=1000)": {
+            "name_en": "SMAY Silencer TAP-15-AA (L=1000)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 33%)",
+            "desc_en": "Absorption silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1000,
+            "spec": [
+                4,
+                8,
+                17,
+                26,
+                42,
+                44,
+                33,
+                26
+            ]
+        },
+        "Tłumik SMAY TAP-15-AR (L=1000)": {
+            "name_en": "SMAY Silencer TAP-15-AR (L=1000)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 33%)",
+            "desc_en": "Resonator silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1000,
+            "spec": [
+                4,
+                4,
+                9,
+                19,
+                33,
+                33,
+                23,
+                15
+            ]
+        },
+        "Tłumik SMAY TAP-21-AA (L=1000)": {
+            "name_en": "SMAY Silencer TAP-21-AA (L=1000)",
+            "desc_pl": "Tłumik absorpcyjny (kulisa 200mm, odstęp 100mm)",
+            "desc_en": "Absorption silencer (200mm splitter)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1000,
+            "spec": [
+                3,
+                8,
+                15,
+                30,
+                43,
+                38,
+                25,
+                16
+            ]
+        },
+        "Tłumik SMAY TAP-21-AR (L=1000)": {
+            "name_en": "SMAY Silencer TAP-21-AR (L=1000)",
+            "desc_pl": "Tłumik rezonatorowy (kulisa 200mm, odstęp 100mm)",
+            "desc_en": "Resonator silencer (200mm splitter)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1000,
+            "spec": [
+                5,
+                11,
+                18,
+                21,
+                29,
+                34,
+                28,
+                22
+            ]
+        },
+        "Tłumik SMAY TAP-22-AA (L=1000)": {
+            "name_en": "SMAY Silencer TAP-22-AA (L=1000)",
+            "desc_pl": "Tłumik absorpcyjny (kulisa 200mm, odstęp 200mm)",
+            "desc_en": "Absorption silencer (200mm splitter, 200mm gap)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1000,
+            "spec": [
+                3,
+                6,
+                12,
+                24,
+                30,
+                26,
+                15,
+                10
+            ]
+        },
+        "Tłumik SMAY TAP-22-AR (L=1000)": {
+            "name_en": "SMAY Silencer TAP-22-AR (L=1000)",
+            "desc_pl": "Tłumik rezonatorowy (kulisa 200mm, odstęp 200mm)",
+            "desc_en": "Resonator silencer (200mm splitter, 200mm gap)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1000,
+            "spec": [
+                2,
+                5,
+                10,
+                21,
+                24,
+                19,
+                12,
+                8
+            ]
+        },
+        "Blacha perforowana 0.7mm": {
+            "name_en": "Perforated steel sheet 0.7mm",
+            "desc_pl": "Osłona wełny",
+            "desc_en": "Wool cover",
+            "type": "Rw / Ctr",
+            "d": 0.7,
+            "rw": 3.0,
+            "ctr": 0.0,
+            "spec": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "Tłumik SMAY TAP-11-AA (L=500)": {
+            "name_en": "SMAY Silencer TAP-11-AA (L=500)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 50%)",
+            "desc_en": "Absorption silencer (50% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 500,
+            "spec": [
+                3,
+                4,
+                5,
+                12,
+                24,
+                22,
+                13,
+                10
+            ]
+        },
+        "Tłumik SMAY TAP-11-AA (L=1500)": {
+            "name_en": "SMAY Silencer TAP-11-AA (L=1500)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 50%)",
+            "desc_en": "Absorption silencer (50% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1500,
+            "spec": [
+                5,
+                5,
+                14,
+                25,
+                42,
+                44,
+                31,
+                20
+            ]
+        },
+        "Tłumik SMAY TAP-11-AA (L=2000)": {
+            "name_en": "SMAY Silencer TAP-11-AA (L=2000)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 50%)",
+            "desc_en": "Absorption silencer (50% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 2000,
+            "spec": [
+                6,
+                7,
+                20,
+                34,
+                48,
+                50,
+                40,
+                27
+            ]
+        },
+        "Tłumik SMAY TAP-15-AA (L=500)": {
+            "name_en": "SMAY Silencer TAP-15-AA (L=500)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 33%)",
+            "desc_en": "Absorption silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 500,
+            "spec": [
+                3,
+                5,
+                9,
+                16,
+                33,
+                38,
+                25,
+                20
+            ]
+        },
+        "Tłumik SMAY TAP-15-AA (L=1500)": {
+            "name_en": "SMAY Silencer TAP-15-AA (L=1500)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 33%)",
+            "desc_en": "Absorption silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1500,
+            "spec": [
+                6,
+                10,
+                23,
+                36,
+                48,
+                48,
+                41,
+                34
+            ]
+        },
+        "Tłumik SMAY TAP-15-AA (L=2000)": {
+            "name_en": "SMAY Silencer TAP-15-AA (L=2000)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 33%)",
+            "desc_en": "Absorption silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 2000,
+            "spec": [
+                7,
+                13,
+                30,
+                45,
+                52,
+                50,
+                48,
+                42
+            ]
+        },
+        "Tłumik SMAY TAP-21-AA (L=500)": {
+            "name_en": "SMAY Silencer TAP-21-AA (L=500)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 33%)",
+            "desc_en": "Absorption silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 500,
+            "spec": [
+                3,
+                4,
+                9,
+                20,
+                26,
+                23,
+                16,
+                11
+            ]
+        },
+        "Tłumik SMAY TAP-21-AA (L=1500)": {
+            "name_en": "SMAY Silencer TAP-21-AA (L=1500)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 33%)",
+            "desc_en": "Absorption silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1500,
+            "spec": [
+                5,
+                12,
+                21,
+                47,
+                51,
+                50,
+                32,
+                19
+            ]
+        },
+        "Tłumik SMAY TAP-21-AA (L=2000)": {
+            "name_en": "SMAY Silencer TAP-21-AA (L=2000)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 33%)",
+            "desc_en": "Absorption silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 2000,
+            "spec": [
+                6,
+                15,
+                28,
+                50,
+                52,
+                51,
+                38,
+                24
+            ]
+        },
+        "Tłumik SMAY TAP-215-AA (L=500)": {
+            "name_en": "SMAY Silencer TAP-215-AA (L=500)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 43%)",
+            "desc_en": "Absorption silencer (43% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 500,
+            "spec": [
+                2,
+                3,
+                8,
+                14,
+                17,
+                15,
+                10,
+                7
+            ]
+        },
+        "Tłumik SMAY TAP-215-AA (L=1000)": {
+            "name_en": "SMAY Silencer TAP-215-AA (L=1000)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 43%)",
+            "desc_en": "Absorption silencer (43% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1000,
+            "spec": [
+                3,
+                6,
+                12,
+                24,
+                30,
+                26,
+                15,
+                10
+            ]
+        },
+        "Tłumik SMAY TAP-215-AA (L=1500)": {
+            "name_en": "SMAY Silencer TAP-215-AA (L=1500)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 43%)",
+            "desc_en": "Absorption silencer (43% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1500,
+            "spec": [
+                4,
+                9,
+                18,
+                36,
+                43,
+                36,
+                22,
+                12
+            ]
+        },
+        "Tłumik SMAY TAP-215-AA (L=2000)": {
+            "name_en": "SMAY Silencer TAP-215-AA (L=2000)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 43%)",
+            "desc_en": "Absorption silencer (43% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 2000,
+            "spec": [
+                5,
+                11,
+                23,
+                46,
+                50,
+                44,
+                25,
+                15
+            ]
+        },
+        "Tłumik SMAY TAP-22-AA (L=500)": {
+            "name_en": "SMAY Silencer TAP-22-AA (L=500)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 50%)",
+            "desc_en": "Absorption silencer (50% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 500,
+            "spec": [
+                2,
+                2,
+                6,
+                12,
+                13,
+                11,
+                7,
+                6
+            ]
+        },
+        "Tłumik SMAY TAP-22-AA (L=1500)": {
+            "name_en": "SMAY Silencer TAP-22-AA (L=1500)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 50%)",
+            "desc_en": "Absorption silencer (50% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1500,
+            "spec": [
+                3,
+                7,
+                16,
+                30,
+                33,
+                25,
+                14,
+                10
+            ]
+        },
+        "Tłumik SMAY TAP-22-AA (L=2000)": {
+            "name_en": "SMAY Silencer TAP-22-AA (L=2000)",
+            "desc_pl": "Tłumik absorpcyjny (prześwit 50%)",
+            "desc_en": "Absorption silencer (50% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 2000,
+            "spec": [
+                4,
+                10,
+                20,
+                30,
+                43,
+                30,
+                17,
+                12
+            ]
+        },
+        "Tłumik SMAY TAP-11-AR (L=500)": {
+            "name_en": "SMAY Silencer TAP-11-AR (L=500)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 50%)",
+            "desc_en": "Resonator silencer (50% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 500,
+            "spec": [
+                3,
+                4,
+                5,
+                8,
+                12,
+                15,
+                11,
+                8
+            ]
+        },
+        "Tłumik SMAY TAP-11-AR (L=1500)": {
+            "name_en": "SMAY Silencer TAP-11-AR (L=1500)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 50%)",
+            "desc_en": "Resonator silencer (50% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1500,
+            "spec": [
+                5,
+                10,
+                15,
+                19,
+                29,
+                29,
+                19,
+                13
+            ]
+        },
+        "Tłumik SMAY TAP-11-AR (L=2000)": {
+            "name_en": "SMAY Silencer TAP-11-AR (L=2000)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 50%)",
+            "desc_en": "Resonator silencer (50% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 2000,
+            "spec": [
+                7,
+                12,
+                19,
+                25,
+                36,
+                34,
+                22,
+                15
+            ]
+        },
+        "Tłumik SMAY TAP-15-AR (L=500)": {
+            "name_en": "SMAY Silencer TAP-15-AR (L=500)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 33%)",
+            "desc_en": "Resonator silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 500,
+            "spec": [
+                3,
+                10,
+                10,
+                12,
+                19,
+                24,
+                21,
+                16
+            ]
+        },
+        "Tłumik SMAY TAP-15-AR (L=1500)": {
+            "name_en": "SMAY Silencer TAP-15-AR (L=1500)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 33%)",
+            "desc_en": "Resonator silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1500,
+            "spec": [
+                7,
+                15,
+                27,
+                28,
+                37,
+                42,
+                35,
+                29
+            ]
+        },
+        "Tłumik SMAY TAP-15-AR (L=2000)": {
+            "name_en": "SMAY Silencer TAP-15-AR (L=2000)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 33%)",
+            "desc_en": "Resonator silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 2000,
+            "spec": [
+                9,
+                18,
+                34,
+                38,
+                48,
+                49,
+                44,
+                36
+            ]
+        },
+        "Tłumik SMAY TAP-21-AR (L=500)": {
+            "name_en": "SMAY Silencer TAP-21-AR (L=500)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 33%)",
+            "desc_en": "Resonator silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 500,
+            "spec": [
+                2,
+                5,
+                12,
+                13,
+                15,
+                12,
+                10,
+                8
+            ]
+        },
+        "Tłumik SMAY TAP-21-AR (L=1500)": {
+            "name_en": "SMAY Silencer TAP-21-AR (L=1500)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 33%)",
+            "desc_en": "Resonator silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1500,
+            "spec": [
+                6,
+                13,
+                31,
+                30,
+                36,
+                27,
+                17,
+                15
+            ]
+        },
+        "Tłumik SMAY TAP-21-AR (L=2000)": {
+            "name_en": "SMAY Silencer TAP-21-AR (L=2000)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 33%)",
+            "desc_en": "Resonator silencer (33% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 2000,
+            "spec": [
+                7,
+                16,
+                41,
+                40,
+                47,
+                31,
+                20,
+                17
+            ]
+        },
+        "Tłumik SMAY TAP-215-AR (L=500)": {
+            "name_en": "SMAY Silencer TAP-215-AR (L=500)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 43%)",
+            "desc_en": "Resonator silencer (43% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 500,
+            "spec": [
+                2,
+                3,
+                8,
+                10,
+                11,
+                8,
+                7,
+                5
+            ]
+        },
+        "Tłumik SMAY TAP-215-AR (L=1000)": {
+            "name_en": "SMAY Silencer TAP-215-AR (L=1000)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 43%)",
+            "desc_en": "Resonator silencer (43% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1000,
+            "spec": [
+                3,
+                6,
+                16,
+                16,
+                16,
+                13,
+                9,
+                8
+            ]
+        },
+        "Tłumik SMAY TAP-215-AR (L=1500)": {
+            "name_en": "SMAY Silencer TAP-215-AR (L=1500)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 43%)",
+            "desc_en": "Resonator silencer (43% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1500,
+            "spec": [
+                4,
+                10,
+                22,
+                22,
+                21,
+                17,
+                11,
+                8
+            ]
+        },
+        "Tłumik SMAY TAP-215-AR (L=2000)": {
+            "name_en": "SMAY Silencer TAP-215-AR (L=2000)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 43%)",
+            "desc_en": "Resonator silencer (43% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 2000,
+            "spec": [
+                5,
+                13,
+                29,
+                29,
+                28,
+                21,
+                14,
+                11
+            ]
+        },
+        "Tłumik SMAY TAP-22-AR (L=500)": {
+            "name_en": "SMAY Silencer TAP-22-AR (L=500)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 50%)",
+            "desc_en": "Resonator silencer (50% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 500,
+            "spec": [
+                1,
+                3,
+                7,
+                7,
+                7,
+                6,
+                5,
+                3
+            ]
+        },
+        "Tłumik SMAY TAP-22-AR (L=1500)": {
+            "name_en": "SMAY Silencer TAP-22-AR (L=1500)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 50%)",
+            "desc_en": "Resonator silencer (50% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1500,
+            "spec": [
+                3,
+                10,
+                18,
+                17,
+                15,
+                12,
+                9,
+                7
+            ]
+        },
+        "Tłumik SMAY TAP-22-AR (L=2000)": {
+            "name_en": "SMAY Silencer TAP-22-AR (L=2000)",
+            "desc_pl": "Tłumik rezonatorowy (prześwit 50%)",
+            "desc_en": "Resonator silencer (50% free area)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 2000,
+            "spec": [
+                5,
+                13,
+                23,
+                22,
+                18,
+                15,
+                12,
+                9
+            ]
+        },
+        "Blacha stalowa płaska 0.5mm": {
+            "name_en": "Flat steel sheet 0.5mm",
+            "desc_pl": "Prawo masy (~3.9 kg/m2)",
+            "desc_en": "Mass law (~3.9 kg/m2)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 0.5,
+            "spec": [
+                1,
+                7,
+                13,
+                19,
+                25,
+                31,
+                37,
+                43
+            ]
+        },
+        "Blacha stalowa płaska 1.0mm": {
+            "name_en": "Flat steel sheet 1.0mm",
+            "desc_pl": "Prawo masy (~7.9 kg/m2)",
+            "desc_en": "Mass law (~7.9 kg/m2)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1.0,
+            "spec": [
+                7,
+                13,
+                19,
+                25,
+                31,
+                37,
+                43,
+                45
+            ]
+        },
+        "Blacha stalowa płaska 1.5mm": {
+            "name_en": "Flat steel sheet 1.5mm",
+            "desc_pl": "Prawo masy (~11.8 kg/m2)",
+            "desc_en": "Mass law (~11.8 kg/m2)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 1.5,
+            "spec": [
+                10,
+                16,
+                22,
+                28,
+                34,
+                40,
+                46,
+                44
+            ]
+        },
+        "Blacha stalowa płaska 2.0mm": {
+            "name_en": "Flat steel sheet 2.0mm",
+            "desc_pl": "Prawo masy (~15.7 kg/m2)",
+            "desc_en": "Mass law (~15.7 kg/m2)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 2.0,
+            "spec": [
+                13,
+                19,
+                25,
+                31,
+                37,
+                43,
+                45,
+                50
+            ]
+        },
+        "Blacha stalowa płaska 2.5mm": {
+            "name_en": "Flat steel sheet 2.5mm",
+            "desc_pl": "Prawo masy (~19.6 kg/m2)",
+            "desc_en": "Mass law (~19.6 kg/m2)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 2.5,
+            "spec": [
+                15,
+                20,
+                27,
+                33,
+                39,
+                45,
+                45,
+                55
+            ]
+        },
+        "Blacha stalowa płaska 3.0mm": {
+            "name_en": "Flat steel sheet 3.0mm",
+            "desc_pl": "Prawo masy (~23.6 kg/m2)",
+            "desc_en": "Mass law (~23.6 kg/m2)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 3.0,
+            "spec": [
+                16,
+                22,
+                28,
+                34,
+                40,
+                46,
+                44,
+                58
+            ]
+        },
+        "Blacha stalowa płaska 3.5mm": {
+            "name_en": "Flat steel sheet 3.5mm",
+            "desc_pl": "Prawo masy (~27.5 kg/m2)",
+            "desc_en": "Mass law (~27.5 kg/m2)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 3.5,
+            "spec": [
+                17,
+                23,
+                29,
+                35,
+                41,
+                46,
+                47,
+                60
+            ]
+        },
+        "Blacha stalowa płaska 4.0mm": {
+            "name_en": "Flat steel sheet 4.0mm",
+            "desc_pl": "Prawo masy (~31.4 kg/m2)",
+            "desc_en": "Mass law (~31.4 kg/m2)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 4.0,
+            "spec": [
+                19,
+                25,
+                31,
+                37,
+                43,
+                45,
+                50,
+                61
+            ]
+        },
+        "Blacha stalowa płaska 4.5mm": {
+            "name_en": "Flat steel sheet 4.5mm",
+            "desc_pl": "Prawo masy (~35.3 kg/m2)",
+            "desc_en": "Mass law (~35.3 kg/m2)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 4.5,
+            "spec": [
+                20,
+                26,
+                32,
+                38,
+                44,
+                45,
+                52,
+                62
+            ]
+        },
+        "Blacha stalowa płaska 5.0mm": {
+            "name_en": "Flat steel sheet 5.0mm",
+            "desc_pl": "Prawo masy (~39.3 kg/m2)",
+            "desc_en": "Mass law (~39.3 kg/m2)",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 5.0,
+            "spec": [
+                21,
+                27,
+                33,
+                39,
+                45,
+                45,
+                55,
+                63
+            ]
+        },
+        "Blacha trapezowa 0.5mm": {
+            "name_en": "Trapezoidal steel sheet 0.5mm",
+            "desc_pl": "Profil usztywniony",
+            "desc_en": "Stiffened profile",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 35.0,
+            "spec": [
+                3,
+                8,
+                14,
+                20,
+                27,
+                25,
+                38,
+                45
+            ]
+        },
+        "Blacha trapezowa 1.0mm": {
+            "name_en": "Trapezoidal steel sheet 1.0mm",
+            "desc_pl": "Profil usztywniony",
+            "desc_en": "Stiffened profile",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 35.0,
+            "spec": [
+                9,
+                14,
+                20,
+                27,
+                29,
+                34,
+                45,
+                51
+            ]
+        },
+        "Blacha trapezowa 1.5mm": {
+            "name_en": "Trapezoidal steel sheet 1.5mm",
+            "desc_pl": "Profil usztywniony",
+            "desc_en": "Stiffened profile",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 35.0,
+            "spec": [
+                12,
+                18,
+                24,
+                30,
+                30,
+                40,
+                48,
+                54
+            ]
+        },
+        "Blacha trapezowa 2.0mm": {
+            "name_en": "Trapezoidal steel sheet 2.0mm",
+            "desc_pl": "Profil usztywniony",
+            "desc_en": "Stiffened profile",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 35.0,
+            "spec": [
+                15,
+                20,
+                27,
+                33,
+                31,
+                44,
+                51,
+                57
+            ]
+        },
+        "Blacha trapezowa 2.5mm": {
+            "name_en": "Trapezoidal steel sheet 2.5mm",
+            "desc_pl": "Profil usztywniony",
+            "desc_en": "Stiffened profile",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 35.0,
+            "spec": [
+                16,
+                22,
+                28,
+                34,
+                33,
+                47,
+                53,
+                59
+            ]
+        },
+        "Blacha trapezowa 3.0mm": {
+            "name_en": "Trapezoidal steel sheet 3.0mm",
+            "desc_pl": "Profil usztywniony",
+            "desc_en": "Stiffened profile",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 35.0,
+            "spec": [
+                18,
+                24,
+                30,
+                34,
+                36,
+                48,
+                54,
+                60
+            ]
+        },
+        "Blacha trapezowa 3.5mm": {
+            "name_en": "Trapezoidal steel sheet 3.5mm",
+            "desc_pl": "Profil usztywniony",
+            "desc_en": "Stiffened profile",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 35.0,
+            "spec": [
+                19,
+                25,
+                31,
+                35,
+                38,
+                49,
+                55,
+                61
+            ]
+        },
+        "Blacha trapezowa 4.0mm": {
+            "name_en": "Trapezoidal steel sheet 4.0mm",
+            "desc_pl": "Profil usztywniony",
+            "desc_en": "Stiffened profile",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 35.0,
+            "spec": [
+                21,
+                27,
+                33,
+                35,
+                40,
+                51,
+                57,
+                63
+            ]
+        },
+        "Blacha trapezowa 4.5mm": {
+            "name_en": "Trapezoidal steel sheet 4.5mm",
+            "desc_pl": "Profil usztywniony",
+            "desc_en": "Stiffened profile",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 35.0,
+            "spec": [
+                22,
+                28,
+                34,
+                36,
+                42,
+                52,
+                58,
+                64
+            ]
+        },
+        "Blacha trapezowa 5.0mm": {
+            "name_en": "Trapezoidal steel sheet 5.0mm",
+            "desc_pl": "Profil usztywniony",
+            "desc_en": "Stiffened profile",
+            "type": "Widmo pasmowe",
+            "rw": 0,
+            "ctr": 0,
+            "d": 35.0,
+            "spec": [
+                23,
+                28,
+                34,
+                36,
+                43,
+                53,
+                59,
+                65
+            ]
+        },
+        "VENTIROCK F PLUS 50mm": {
+            "name_en": "VENTIROCK F PLUS 50mm",
+            "desc_pl": "Wełna skalna fasadowa (65kg/m3)",
+            "desc_en": "Rock wool (65kg/m3)",
+            "type": "Widmo pasmowe",
+            "d": 50.0,
+            "rw": 0.0,
+            "ctr": 0.0,
+            "spec": [
+                5.5,
+                6.0,
+                6.0,
+                6.0,
+                9.0,
+                12.0,
+                15.0,
+                16.0
+            ]
+        },
+        "VENTIROCK F PLUS 80mm": {
+            "name_en": "VENTIROCK F PLUS 80mm",
+            "desc_pl": "Wełna skalna fasadowa (65kg/m3)",
+            "desc_en": "Rock wool (65kg/m3)",
+            "type": "Widmo pasmowe",
+            "d": 80.0,
+            "rw": 0.0,
+            "ctr": 0.0,
+            "spec": [
+                11.0,
+                11.0,
+                11.5,
+                12.0,
+                14.5,
+                17.0,
+                23.0,
+                24.5
+            ]
+        },
+        "VENTIROCK F PLUS 100mm": {
+            "name_en": "VENTIROCK F PLUS 100mm",
+            "desc_pl": "Wełna skalna fasadowa (65kg/m3)",
+            "desc_en": "Rock wool (65kg/m3)",
+            "type": "Widmo pasmowe",
+            "d": 100.0,
+            "rw": 0.0,
+            "ctr": 0.0,
+            "spec": [
+                14.5,
+                16.0,
+                16.0,
+                18.0,
+                22.0,
+                29.5,
+                36.0,
+                40.0
+            ]
+        },
+        "VENTIROCK SUPER 50mm": {
+            "name_en": "VENTIROCK SUPER 50mm",
+            "desc_pl": "Wełna skalna fasadowa (110kg/m3)",
+            "desc_en": "Rock wool (110kg/m3)",
+            "type": "Widmo pasmowe",
+            "d": 50.0,
+            "rw": 0.0,
+            "ctr": 0.0,
+            "spec": [
+                11.0,
+                11.0,
+                11.5,
+                12.0,
+                14.5,
+                17.0,
+                23.0,
+                24.5
+            ]
+        },
+        "VENTIROCK SUPER 80mm": {
+            "name_en": "VENTIROCK SUPER 80mm",
+            "desc_pl": "WWełna skalna fasadowa (110kg/m3)",
+            "desc_en": "Rock wool (110kg/m3)",
+            "type": "Widmo pasmowe",
+            "d": 80.0,
+            "rw": 0.0,
+            "ctr": 0.0,
+            "spec": [
+                19.0,
+                21.0,
+                21.0,
+                23.0,
+                28.0,
+                36.0,
+                43.0,
+                48.0
+            ]
+        },
+        "VENTIROCK SUPER 100mm": {
+            "name_en": "VENTIROCK SUPER 100mm",
+            "desc_pl": "Wełna skalna fasadowa (110kg/m3)",
+            "desc_en": "Rock wool (110kg/m3)",
+            "type": "Widmo pasmowe",
+            "d": 100.0,
+            "rw": 0.0,
+            "ctr": 0.0,
+            "spec": [
+                25.0,
+                28.0,
+                28.0,
+                32.0,
+                40.0,
+                50.0,
+                58.0,
+                65.0
+            ]
+        },
+        "Płyta PROMATECT-100X 12mm": {
+            "name_en": "PROMATECT-100X board 12mm",
+            "desc_pl": "Płyta ogniochronna krzemianowo-wapniowa (~10.1 kg/m2)",
+            "desc_en": "Calcium silicate fire protection board (~10.1 kg/m2)",
+            "type": "Rw / Ctr",
+            "d": 12.0,
+            "rw": 29.0,
+            "ctr": -3.0,
+            "spec": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "Płyta PROMATECT-100X 20mm": {
+            "name_en": "PROMATECT-100X board 20mm",
+            "desc_pl": "Płyta ogniochronna krzemianowo-wapniowa (~16.8 kg/m2)",
+            "desc_en": "Calcium silicate fire protection board (~16.8 kg/m2)",
+            "type": "Widmo pasmowe",
+            "d": 20.0,
+            "rw": 0.0,
+            "ctr": 0.0,
+            "spec": [
+                13.0,
+                19.0,
+                25.0,
+                31.0,
+                34.0,
+                40.0,
+                49.0,
+                55.0
+            ]
+        },
+        "Płyta PROMATECT-100X 15mm": {
+            "name_en": "PROMATECT-100X board 15mm",
+            "desc_pl": "Płyta ogniochronna krzemianowo-wapniowa (~12.6 kg/m2)",
+            "desc_en": "Calcium silicate fire protection board (~12.6 kg/m2)",
+            "type": "Widmo pasmowe",
+            "d": 15.0,
+            "rw": 0,
+            "ctr": 0,
+            "spec": [
+                11,
+                17,
+                23,
+                29,
+                34,
+                34,
+                47,
+                53
+            ]
+        },
+        "Blacha ryflowana 4.0mm": {
+            "name_en": "Checker steel plate 4.0mm",
+            "desc_pl": "Blacha łezkowa (z ryflem odpow. ~33.5 kg/m2)",
+            "desc_en": "Teardrop checker plate (~33.5 kg/m2)",
+            "type": "Widmo pasmowe",
+            "d": 4.0,
+            "rw": 0.0,
+            "ctr": 0.0,
+            "spec": [
+                20.0,
+                26.0,
+                32.0,
+                38.0,
+                44.0,
+                46.0,
+                51.0,
+                62.0
+            ]
+        },
+        "Płyta PROMATECT-100X 2x12mm": {
+            "name_en": "PROMATECT-100X board 2x12mm",
+            "desc_pl": "Płyta ogniochronna krzemianowo-wapniowa (~10.1 kg/m2)",
+            "desc_en": "Calcium silicate fire protection board (~10.1 kg/m2)",
+            "type": "Rw / Ctr",
+            "d": 24.0,
+            "rw": 30.0,
+            "ctr": -1.0,
+            "spec": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "Płyta PROMATECT H 2x10m": {
+            "name_en": "PROMATECT H board 2x10mm",
+            "desc_pl": "Płyta ogniochronna (~18 kg/m2)",
+            "desc_en": "Fire protection board (~18 kg/m2)",
+            "type": "Rw / Ctr",
+            "d": 20.0,
+            "rw": 33.0,
+            "ctr": -3.0,
+            "spec": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        },
+        "Płyta PROMATECT L 2x20m": {
+            "name_en": "PROMATECT L board 2x20mm",
+            "desc_pl": "Płyta ogniochronna (~18.8 kg/m2)",
+            "desc_en": "Fire protection board (~18.8 kg/m2)",
+            "type": "Rw / Ctr",
+            "d": 40.0,
+            "rw": 31.0,
+            "ctr": -2.0,
+            "spec": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "engines": {
+        "QSK50-G15": {
+            "genset": "C1875D5E",
+            "lw": [
+                84.7,
+                95.1,
+                100.6,
+                102.8,
+                104.2,
+                103.6,
+                102.0,
+                102.1
+            ]
+        },
+        "QSK78-G39": {
+            "genset": "C3500D5EB",
+            "lw": [
+                88.6,
+                107.8,
+                110.4,
+                118.3,
+                119.1,
+                120.5,
+                117.1,
+                119.4
+            ]
+        }
+    },
+    "radiators": {
+        "BERRY RADIATEURS QSK95-G4": {
+            "lw": [
+                106.0,
+                107.0,
+                115.0,
+                108.0,
+                106.0,
+                103.5,
+                100.5,
+                97.5
+            ],
+            "att": [
+                1.0,
+                1.0,
+                2.0,
+                4.0,
+                6.0,
+                7.0,
+                8.0,
+                9.0
+            ]
+        }
+    }
+}

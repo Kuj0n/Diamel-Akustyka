@@ -1,0 +1,28 @@
+# Wydania (buildy PyInstaller, instalatory .exe) - publikowane jako GitHub Releases
+[0-9]*.[0-9]*.[0-9]*/
+build/
+dist/
+*.spec
+
+# Stare sekrety (hasło SMTP, klucze) - program ich już nie używa
+Konfiguracja/
+
+# Logotypy innych firm
+Zasoby/logo_genpower.jpg
+
+# Projekty, kopie i ustawienia lokalne
+AMS.json
+Backup/
+akustyka_config.json
+acoustic_db_backup_*.json
+
+# Stare pliki dystrybucji przez diamel.pl (zastąpione przez GitHub)
+acoustic_db_v*.json
+wersja.json
+wersja_bazy.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
