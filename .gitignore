@@ -10,14 +10,23 @@ Konfiguracja/
 # Logotypy innych firm
 Zasoby/logo_genpower.jpg
 
-# Projekty, kopie i ustawienia lokalne
+# Materiały producentów (prawa autorskie osób trzecich)
+datasheet/
+
+# Projekty klientów i wzorzec wyników wersji 1.1.0 do testów (testy/test_obliczenia.py)
+testy/dane_prywatne/
+
+# Notatki robocze
+ANALIZA_OBLICZEN.md
+
+# Baza jest na serwerze diamel.pl (panel administracyjny) - kopia do instalatora pobierana przy kompilacji
+data/
+
+# Projekty, kopie i ustawienia lokalne (wersje 1.x)
 AMS.json
 Backup/
 akustyka_config.json
-acoustic_db_backup_*.json
-
-# Stare pliki dystrybucji przez diamel.pl (zastąpione przez GitHub)
-acoustic_db_v*.json
+acoustic_db*.json
 wersja.json
 wersja_bazy.json
 

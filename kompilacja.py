@@ -6,16 +6,19 @@ import shutil
 
 # --- KONFIGURACJA ---
 folder_zasoby = "Zasoby"
-plik_glowny = "start_akustyka.py"
-pliki_modulow = ["gui_akustyka.py", "narzedzia.py", "konfiguracja_app.py"]
+folder_data = "data" 
+plik_glowny = "aplikacja.py"
+pliki_modulow = ["interfejs.py", "obliczenia.py", "raport_docx.py", "baza.py", "konto.py", "konfiguracja_app.py"]
+folder_ui = "ui"  # wygląd okna (HTML/CSS/JS, czcionki) - Edge WebView2 przez pywebview
 plik_ikony = os.path.join(folder_zasoby, "ikona.ico")
+url_bazy_serwera = "https://diamel.pl/api/akustyka.php"  # baza materiałów, silników i chłodnic z panelu administracyjnego
 
 inno_setup_compiler = r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 if not os.path.exists(inno_setup_compiler):
     print("❌ Błąd: Nie znaleziono kompilatora Inno Setup!")
     exit(1)
 
-print("🔍 Analizowanie konfiguracji (wersja MVC)...")
+print("🔍 Analizowanie konfiguracji (Kalkulator Akustyki)...")
 with open("konfiguracja_app.py", "r", encoding="utf-8") as f:
     kod_konf = f.read()
 
@@ -23,45 +26,80 @@ wersja = re.search(r'VERSION\s*=\s*"([^"]+)"', kod_konf).group(1)
 data_wydania = re.search(r'BUILD_DATE\s*=\s*"([^"]+)"', kod_konf).group(1)[:10]
 changelog_full = re.search(r'CHANGELOG\s*=\s*"""(.*?)"""', kod_konf, re.DOTALL).group(1).strip()
 github_repo = re.search(r'GITHUB_REPO\s*=\s*"([^"]+)"', kod_konf).group(1)
-
-# Paczka = pliki wydania na GitHub (instalator). Baza nie jest częścią wydania -
-# program pobiera acoustic_db.json z gałęzi master repozytorium.
+# Paczka = pliki wydania na GitHub (instalator). Baza urządzeń: kopia z serwera z dnia kompilacji (pierwsze
+# uruchomienie bez internetu) - program pobiera aktualną bazę z panelu przy każdym starcie.
 folder_archiwum = os.path.join(wersja, "Archiwum")
 folder_paczka = os.path.join(wersja, "Paczka")
 
 os.makedirs(folder_archiwum, exist_ok=True)
 os.makedirs(folder_paczka, exist_ok=True)
 
-print("📂 Kopiowanie rozdzielonych modułów i zasobów...")
+def pobierz_baze(folder):
+    """Aktualna baza z serwera (diamel.pl/api/akustyka.php) do folderu data programu - pliki materials/engines/radiators.json."""
+    import urllib.request
+    req = urllib.request.Request(url_bazy_serwera, data=json.dumps({"akcja": "baza"}).encode(),
+                                 headers={"Content-Type": "application/json", "User-Agent": "Diamel-kompilacja"})
+    with urllib.request.urlopen(req, timeout=30) as odp:
+        baza = json.loads(odp.read().decode("utf-8"))
+    if not baza.get("ok") or not baza.get("materials"):
+        raise SystemExit("❌ Serwer zwrócił niepełną bazę - kompilacja przerwana.")
+    os.makedirs(folder, exist_ok=True)
+    for rodzaj in ("materials", "engines", "radiators"):
+        with open(os.path.join(folder, f"{rodzaj}.json"), "w", encoding="utf-8") as f:
+            json.dump({"version": str(baza["wersja"]), rodzaj: baza.get(rodzaj) or {}}, f, ensure_ascii=False, indent=4)
+    print(f"🗄️  Baza z serwera: wersja {baza['wersja']} ({len(baza['materials'])} materiałów, "
+          f"{len(baza.get('engines') or {})} silników, {len(baza.get('radiators') or {})} chłodnic)")
+
+print("📂 Kopiowanie rozdzielonych modułów, danych i zasobów...")
 for m_plik in [plik_glowny] + pliki_modulow:
     if os.path.exists(m_plik): shutil.copy(m_plik, os.path.join(folder_archiwum, m_plik))
+
 if os.path.exists(folder_zasoby):
     shutil.copytree(folder_zasoby, os.path.join(folder_archiwum, folder_zasoby), dirs_exist_ok=True)
-if os.path.exists(plik_ikony): shutil.copy(plik_ikony, os.path.join(folder_archiwum, "ikona.ico"))
+shutil.copytree(folder_ui, os.path.join(folder_archiwum, folder_ui), dirs_exist_ok=True)
+
+pobierz_baze(os.path.join(folder_archiwum, folder_data))
+
+ikona_skopiowana = False
+if os.path.exists(plik_ikony): 
+    shutil.copy(plik_ikony, os.path.join(folder_archiwum, "ikona.ico"))
+    ikona_skopiowana = True
+else:
+    print("⚠️ Ostrzeżenie: Nie znaleziono pliku 'ikona.ico' w folderze Zasoby. Kompilacja bez ikony.")
 
 v_parts = wersja.split('.') + ['0'] * (4 - len(wersja.split('.')))
 v_str = ".".join(v_parts)
-nazwa_stala = "Akustyka_Kalkulator"
+nazwa_stala = "Akustyka_Kalkulator"  # jak w wersjach 1.x - instalacja zastępuje starą wersję
 nazwa_instalatora_exe = f"Instalator_Akustyka_v{wersja}.exe"
 
 with open(os.path.join(folder_archiwum, "wersja_info.txt"), "w", encoding="utf-8") as f:
-    f.write(f"VSVersionInfo(ffi=FixedFileInfo(filevers=({v_parts[0]},{v_parts[1]},{v_parts[2]},{v_parts[3]}), prodvers=({v_parts[0]},{v_parts[1]},{v_parts[2]},{v_parts[3]}), mask=0x3f, flags=0x0, OS=0x40004, fileType=0x1, subtype=0x0, date=(0, 0)), kids=[StringFileInfo([StringTable(u'041504b0', [StringStruct(u'CompanyName', u'Diamel'), StringStruct(u'FileDescription', u'Akustyka Raporty'), StringStruct(u'FileVersion', u'{v_str}'), StringStruct(u'OriginalFilename', u'{nazwa_stala}.exe'), StringStruct(u'ProductName', u'Akustyka Kalkulator'), StringStruct(u'ProductVersion', u'{v_str}')])]), VarFileInfo([VarStruct(u'Translation', [1045, 1200])])])")
+    f.write(f"VSVersionInfo(ffi=FixedFileInfo(filevers=({v_parts[0]},{v_parts[1]},{v_parts[2]},{v_parts[3]}), prodvers=({v_parts[0]},{v_parts[1]},{v_parts[2]},{v_parts[3]}), mask=0x3f, flags=0x0, OS=0x40004, fileType=0x1, subtype=0x0, date=(0, 0)), kids=[StringFileInfo([StringTable(u'041504b0', [StringStruct(u'CompanyName', u'Diamel'), StringStruct(u'FileDescription', u'Kalkulator Akustyki Obudów'), StringStruct(u'FileVersion', u'{v_str}'), StringStruct(u'OriginalFilename', u'{nazwa_stala}.exe'), StringStruct(u'ProductName', u'Kalkulator Akustyki'), StringStruct(u'ProductVersion', u'{v_str}')])]), VarFileInfo([VarStruct(u'Translation', [1045, 1200])])])")
 
-# Lista zmian tej wersji = opis wydania na GitHub
 wzorzec = rf'(v{wersja}.*?)(?=\nv\d+\.\d+|$)'
 match = re.search(wzorzec, changelog_full, re.DOTALL)
 log_wersji = match.group(1).strip() if match else f"v{wersja}\nZaktualizowano."
 
 print(f"⏳ Kompilacja struktury programu dla wersji {wersja}...")
-cmd = (f'python -m PyInstaller --onedir --noconsole --clean --icon="ikona.ico" '
-       f'--add-data "ikona.ico;." --add-data "{folder_zasoby};{folder_zasoby}" '
+
+cmd_icon = f'--icon="ikona.ico" --add-data "ikona.ico;."' if ikona_skopiowana else ""
+cmd_zasoby = f'--add-data "{folder_zasoby};{folder_zasoby}"' if os.path.exists(folder_zasoby) else ""
+
+cmd = (f'python -m PyInstaller --onedir --noconsole --clean --noconfirm {cmd_icon} '
+       f'{cmd_zasoby} '
+       f'--add-data "{folder_data};{folder_data}" '
+       f'--add-data "{folder_ui};{folder_ui}" '
+       f'--collect-all webview --collect-all clr_loader --collect-all pythonnet --hidden-import clr --hidden-import docx '
+       f'--hidden-import win32com.client --hidden-import pythoncom --hidden-import PIL.ImageDraw --hidden-import PIL.ImageFont '
        f'--version-file="wersja_info.txt" -n "{nazwa_stala}" "{plik_glowny}"')
+
 subprocess.run(cmd, shell=True, cwd=folder_archiwum, check=True)
 
 sciezka_folderu_dist = os.path.join(folder_archiwum, "dist", nazwa_stala)
 
 plik_info_txt = os.path.join(folder_archiwum, "info_instalatora.txt")
-with open(plik_info_txt, "w", encoding="utf-8") as f: f.write(f"KALKULATOR AKUSTYKI - DIAMEL\nWersja: {wersja}\n\n{changelog_full}")
+with open(plik_info_txt, "w", encoding="utf-8") as f: f.write(f"KALKULATOR AKUSTYKI OBUDÓW - DIAMEL\nWersja: {wersja}\n\n{changelog_full}")
+
+inno_icon_line = f'SetupIconFile={os.path.abspath(os.path.join(folder_archiwum, "ikona.ico"))}' if ikona_skopiowana else ""
 
 inno_skrypt = f"""
 [Setup]
@@ -75,10 +113,11 @@ DisableWelcomePage=no
 DisableProgramGroupPage=yes
 OutputDir={os.path.abspath(folder_paczka)}
 OutputBaseFilename=Instalator_Akustyka_v{wersja}
-SetupIconFile={os.path.abspath(os.path.join(folder_archiwum, "ikona.ico"))}
+{inno_icon_line}
 Compression=lzma2/ultra
 SolidCompression=yes
 PrivilegesRequired=lowest
+UninstallDisplayIcon={{app}}\\{nazwa_stala}.exe
 InfoBeforeFile={os.path.abspath(plik_info_txt)}
 
 [Languages]
@@ -86,6 +125,10 @@ Name: "pl"; MessagesFile: "compiler:Languages\\Polish.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "Utwórz skrót na pulpicie"
+
+[InstallDelete]
+; stare biblioteki (wersje 1.x: Tkinter) - acoustic_db.json obok programu zostaje, program przenosi z niego wpisy własne
+Type: filesandordirs; Name: "{{app}}\\_internal"
 
 [Files]
 Source: "{os.path.abspath(sciezka_folderu_dist)}\\*"; DestDir: "{{app}}"; Flags: ignoreversion recursesubdirs createallsubdirs

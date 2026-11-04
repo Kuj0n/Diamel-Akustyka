@@ -4,11 +4,27 @@ import sys
 # ==========================================
 # KONFIGURACJA I METADANE
 # ==========================================
-VERSION = "1.1.0"
-DB_VERSION = "1.0.0"
-BUILD_DATE = "2026-11-02 23:00"
+VERSION = "2.0.0"
+DB_VERSION = "0"  # wersja bazy, gdy lokalny plik jej nie zawiera (baza z panelu diamel.pl ma numer wersji 1, 2, 3...)
+BUILD_DATE = "2026-11-05 12:00"
 
 CHANGELOG = """
+v2.0.0 (2026-11-05)
+- Nowy program: okno w stylu Korektora HR i Kalkulatora Rozruchu, wyniki liczone na bieżąco podczas wpisywania.
+- Logowanie kontem Diamel przy uruchomieniu (jak w Korektorze HR): raporty na papierze firmowym Twojej firmy,
+  inicjały w raporcie, pliki producentów z bazy; można pracować bez logowania.
+- Baza materiałów, silników i chłodnic na serwerze diamel.pl (edytowana w panelu administracyjnym), pobierana przy
+  starcie; wpisy własne zostają przy aktualizacji. Karty producentów - po zalogowaniu.
+- Naprawa: udział modułów w raporcie - każdy moduł liczony względem powierzchni pomiarowej, moduły sumują się do
+  wyniku całkowitego (wcześniej małe moduły, np. czerpnia, wychodziły głośniejsze niż cała obudowa). Wynik całkowity
+  w punkcie bez zmian.
+- Naprawa: dwa punkty pomiarowe w tej samej odległości (np. front i bok 1 m) - oba w wynikach i raporcie.
+- Naprawa: jedno widmo silnika na ekranie, w obliczeniach i w raporcie. Przy każdym widmie (silnik, wydech, chłodnica)
+  wybór jednostki dB / dB(A) - korekta A dodawana tylko do widm w dB.
+- Raport PDF / DOCX w nowym układzie: wykres widma, udział modułów, ocena każdego punktu, opis metody; szablon
+  z nagłówkiem i stopką (Ustawienia albo papier firmowy z konta).
+- Projekty z wersji 1.x otwierają się bez zmian wyników.
+
 v1.1.0 (2026-11-02)
 - Aktualizacje programu pobierane z GitHub (github.com/Kuj0n/Diamel-Akustyka).
 - Baza danych aktualizowana z repozytorium - nowe materiały bez instalowania nowej wersji programu.
@@ -22,37 +38,33 @@ v1.0.0 (2026-09-16)
 - Pełne obliczenia ISO 3744 z uwzględnieniem wielu dystansów i wpływu wysokości komina.
 """
 
-CHANGELOG_DB = """
-v1.0.0 (2026-09-16)
-- Dodano wbudowaną bazę materiałów tłumiących.
-- Zaimplementowano bazę silników Cummins (w tym widma wydechowe).
-- Dodano parametry chłodnic Berry Radiateurs.
-"""
-
-# Aktualizacje (GitHub: wydania programu, baza z gałęzi master) i zgłoszenia (formularz na diamel.pl)
+# Aktualizacje (GitHub: wydania programu), baza (panel diamel.pl), zgłoszenia i konto (diamel.pl)
 NAZWA_PROGRAMU = "akustyka"
 GITHUB_REPO = "Kuj0n/Diamel-Akustyka"
-URL_BAZY = f"https://raw.githubusercontent.com/{GITHUB_REPO}/master/acoustic_db.json"
+URL_BAZY = "https://diamel.pl/api/akustyka.php"  # baza materiałów, silników i chłodnic edytowana w panelu administracyjnym
 URL_ZGLOSZEN = "https://diamel.pl/api/zgloszenie.php"
+URL_KONTA = "https://diamel.pl/api/konto.php"  # logowanie kontem Diamel (szablon raportu firmy, inicjały)
+
 
 def sciezka_do_zasobu(relatywna_sciezka):
     """ Pancerna funkcja szukająca plików zasobów w trybie .exe i developerskim """
     katalogi = [
+        os.path.dirname(os.path.abspath(__file__)),
         os.path.abspath("."),
         os.path.join(os.path.abspath("."), "_internal")
     ]
     if hasattr(sys, '_MEIPASS'):
         katalogi.insert(0, sys._MEIPASS)
         katalogi.insert(1, os.path.join(sys._MEIPASS, "_internal"))
-        
+
     if hasattr(sys, 'executable'):
         baza_exe = os.path.dirname(sys.executable)
         katalogi.append(baza_exe)
         katalogi.append(os.path.join(baza_exe, "_internal"))
-        
+
     for k in katalogi:
         pelna = os.path.join(k, relatywna_sciezka)
         if os.path.exists(pelna):
             return pelna
-            
+
     return relatywna_sciezka
