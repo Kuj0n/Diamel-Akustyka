@@ -36,6 +36,8 @@ const IK = {
   baza: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
   szukaj: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
   warstwy: '<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5M3 17l9 5 9-5"/>',
+  obudowa: '<path d="M3 8l9-5 9 5v8l-9 5-9-5Z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+  wiatrak: '<circle cx="12" cy="12" r="2"/><path d="M12 10c0-4 1-7 4-7s2 5-2 8M14 12c4 0 7 1 7 4s-5 2-8-2M12 14c0 4-1 7-4 7s-2-5 2-8M10 12c-4 0-7-1-7-4s5-2 8 2"/>',
 };
 const ik = (n, kl = '') => `<svg class="ik ${kl}" viewBox="0 0 24 24">${IK[n]}</svg>`;
 
@@ -409,7 +411,6 @@ const TYPY_OBUDOWY = [['Obudowa kontenerowa', 'Obudowa kontenerowa'], ['Obudowa 
 const liczbaJs = (v) => { const n = Number(String(v ?? '').replace(',', '.').replace(/\s/g, '')); return Number.isFinite(n) ? n : 0; };
 const sumaDb = (l) => { const w = l.reduce((s, x) => s + 10 ** (liczbaJs(x) / 10), 0); return w > 0 ? 10 * Math.log10(w) : 0; };
 const widmoA = (l, j) => l.map((x, i) => liczbaJs(x) + (j === 'dB' ? INFO.korekta_a[i] : 0));
-const rozwiniete = new Set(['sciana']);  // otwarte karty modułów
 
 function pTekst(sc, etykieta, { podpowiedz = '', lista = '' } = {}) {
   return `<div class="p-pole"><label class="etykieta">${etykieta}</label><input class="pole" data-sc="${sc}" value="${esc(wez(sc))}" spellcheck="false" placeholder="${esc(podpowiedz)}" ${lista ? `list="${lista}"` : ''}></div>`;
@@ -437,13 +438,61 @@ function pWidmo(sc, etykieta, { jedn = null, wyliczone = null, opisWyl = 'LwA [d
     </div></div>`;
 }
 
+// Zakładki ekranu obliczeń: dane projektu, obudowa, źródło, każdy moduł osobno, chłodnica. Wyniki po prawej - zawsze widoczne.
+let zakladka = 'projekt';
+const MODULY_KROTKO = { sciana: 'Ściany', podloga: 'Podłoga', sufit: 'Sufit', drzwi: 'Drzwi', czerpnia: 'Czerpnia', wyrzut: 'Wyrzut', wydech: 'Wydech' };
+const zakladkiObl = () => [['projekt', 'Projekt', 'plik'], ['obudowa', 'Obudowa i punkty', 'obudowa'], ['silnik', 'Silnik', 'silnik'],
+  ...INFO.moduly.map((k) => [k, MODULY_KROTKO[k], 'warstwy']), ['chlodnica', 'Chłodnica', 'wiatrak']];
+
+/** Opis pod nazwą zakładki: moduł - udział w hałasie w pierwszym punkcie (albo "wył."), chłodnica - wł. / wył. */
+function opisZakladki(z) {
+  if (INFO.moduly.includes(z)) {
+    if (!P.modules_active[z]) return 'wył.';
+    const u = W?.ok ? W.punkty[0]?.moduly[z] : null;
+    return u ? `${lp(u.procent, 0)}%` : '…';
+  }
+  if (z === 'chlodnica') return P.radiator.active ? 'wł.' : 'wył.';
+  if (z === 'obudowa') return `${P.points.length} ${P.points.length === 1 ? 'punkt' : 'punkty'}`;
+  if (z === 'silnik') return W?.ok ? `${lp(W.lw_a_suma, 1)} dB(A)` : '';
+  return '';
+}
+function odswiezZakladki() {
+  for (const [z] of zakladkiObl()) {
+    const b = $(`[data-zakl="${z}"]`);
+    if (!b) continue;
+    b.querySelector('small').textContent = opisZakladki(z);
+    const dom = W?.ok && W.punkty[0]?.dominujacy === z;
+    b.classList.toggle('dominujacy', !!dom);
+    b.classList.toggle('wylaczony', (INFO.moduly.includes(z) && !P.modules_active[z]) || (z === 'chlodnica' && !P.radiator.active));
+  }
+}
+
 function rysujObliczenia() {
   const el = $('#widok-obliczenia');
-  const m = P.meta, ak = P.acoustics, rad = P.radiator;
-  const silniki = Object.keys(BAZA.engines || {}).sort((a, b) => a.localeCompare(b, 'pl'));
   el.innerHTML = `<div class="dane" id="dane">
-    <div class="karta">
-      <div class="naglowek-karty"><h3><span class="nr">1</span>Projekt</h3>${pSegment('meta.jezyk_raportu', [['Polski', 'Raport PL'], ['English', 'Raport EN']])}</div>
+    <nav class="zakladki-obl">${zakladkiObl().map(([z, t, ikona]) => `<button data-zakl="${z}" class="${z === zakladka ? 'akt' : ''}">${ik(ikona)}<span>${t}</span><small></small></button>`).join('')}</nav>
+    <div id="tresc-zakladki">${trescZakladki()}</div>
+  </div>
+  <aside class="wyniki"><div class="przewijane" id="wyniki"></div>
+    <div class="stopka">
+      <div class="przyciski-raportu"><button class="btn btn-hr btn-raport-duzy" id="generuj" title="Raport PDF (Ctrl+G)">${ik('dokument')} Raport PDF</button>
+        <button class="btn btn-raport-duzy" id="generuj-docx" title="Raport do edycji w Wordzie (Ctrl+Shift+G)">${ik('word')} DOCX</button></div>
+      <div class="podp" id="stopka-raportu"></div>
+    </div>
+  </aside>`;
+  if (zakladka === 'projekt') rysujRewizje();
+  odswiezZakladki();
+  przelicz();
+  $('#generuj').onclick = () => generujRaport('pdf');
+  $('#generuj-docx').onclick = () => generujRaport('docx');
+}
+
+function trescZakladki() {
+  const m = P.meta, ak = P.acoustics, rad = P.radiator;
+  if (zakladka === 'projekt') {
+    const silniki = Object.keys(BAZA.engines || {}).sort((a, b) => a.localeCompare(b, 'pl'));
+    return `<div class="karta">
+      <div class="naglowek-karty"><h3>${ik('plik')}Projekt</h3>${pSegment('meta.jezyk_raportu', [['Polski', 'Raport PL'], ['English', 'Raport EN']])}</div>
       <div class="pola">
         ${pTekst('meta.project_no', 'Numer projektu', { podpowiedz: 'np. PRJ-2026-224' })}${pTekst('meta.client_name', 'Klient')}${pTekst('meta.autor', 'Przygotował (inicjały)')}
         ${pTekst('meta.project_name', 'Tytuł raportu', { podpowiedz: 'Analiza akustyczna obudowy agregatu' })}${pTekst('meta.po_number', 'Numer P.O.')}${pTekst('meta.client_doc_no', 'Dokument klienta')}
@@ -453,88 +502,83 @@ function rysujObliczenia() {
           <datalist id="lista-silnikow">${silniki.map((n) => `<option value="${esc(n)}">${esc(BAZA.engines[n].genset || '')}</option>`).join('')}</datalist></div>
         <div class="p-pole"><label class="etykieta">Typ instalacji</label>${pWybor('meta.typ_obudowy', TYPY_OBUDOWY)}</div>
       </div>
-      <details class="sekcja" id="sekcja-rewizje"><summary>${ik('dalej')} Tabela rewizji dokumentu <span class="podp">(${P.revisions.length})</span></summary><div id="rewizje"></div></details>
-    </div>
-
+      <p class="podp" style="margin:4px 0 0">Wybór silnika z bazy wpisuje jego widmo w zakładce <b>Silnik</b>.</p></div>
+    <div class="karta"><div class="naglowek-karty"><h3>${ik('odswiez')}Tabela rewizji dokumentu</h3></div><div id="rewizje"></div></div>`;
+  }
+  if (zakladka === 'obudowa') {
+    return `<div class="karta">
+      <div class="naglowek-karty"><h3>${ik('obudowa')}Wymiary obudowy</h3><span class="podp">ściany, podłoga i sufit liczone z wymiarów</span></div>
+      <div class="pola">${pLiczba('dimensions.kont_l', 'Długość', 'm')}${pLiczba('dimensions.kont_w', 'Szerokość', 'm')}${pLiczba('dimensions.kont_h', 'Wysokość', 'm')}</div></div>
     <div class="karta">
-      <div class="naglowek-karty"><h3><span class="nr">2</span>Obudowa i punkty pomiarowe</h3><span class="podp">powierzchnia pomiarowa wg ISO 3744</span></div>
-      <div class="pola">${pLiczba('dimensions.kont_l', 'Długość', 'm')}${pLiczba('dimensions.kont_w', 'Szerokość', 'm')}${pLiczba('dimensions.kont_h', 'Wysokość', 'm')}</div>
+      <div class="naglowek-karty"><h3>${ik('info')}Punkty pomiarowe</h3><span class="podp">powierzchnia pomiarowa wg ISO 3744</span></div>
       <table class="tabela-punktow"><thead><tr><th>Punkt pomiarowy</th><th>Odległość</th><th>Wymagany poziom</th><th></th></tr></thead><tbody>
         ${P.points.map((pt, i) => `<tr><td><input class="pole" data-sc="points.${i}.name" value="${esc(pt.name)}" placeholder="np. Front 1 m"></td>
           <td><div class="z-jednostka"><input class="pole" data-sc="points.${i}.d" value="${esc(pt.d)}" inputmode="decimal"><span class="jedn">m</span></div></td>
           <td><div class="z-jednostka"><input class="pole" data-sc="points.${i}.limit" value="${esc(pt.limit)}" inputmode="decimal"><span class="jedn">dB(A)</span></div></td>
           <td class="w-x">${P.points.length > 1 ? `<button class="btn btn-bez btn-ikona" data-usun-pkt="${i}" title="Usuń punkt">${ik('kosz')}</button>` : ''}</td></tr>`).join('')}
       </tbody></table>
-      <button class="btn btn-maly" id="dodaj-pkt">${ik('plus')} Dodaj punkt</button>
-    </div>
-
-    <div class="karta">
-      <div class="naglowek-karty"><h3><span class="nr">3</span>Silnik - źródło hałasu</h3><span class="podp">moc akustyczna Lw w pasmach oktawowych</span></div>
+      <button class="btn btn-maly" id="dodaj-pkt">${ik('plus')} Dodaj punkt</button></div>`;
+  }
+  if (zakladka === 'silnik') {
+    return `<div class="karta">
+      <div class="naglowek-karty"><h3>${ik('silnik')}Silnik - źródło hałasu</h3><span class="podp">${esc(m.silnik_typ || 'moc akustyczna Lw w pasmach oktawowych')}</span></div>
       ${pWidmo('acoustics.lw_vars', 'Widmo mocy akustycznej silnika (z karty producenta)', { jedn: 'acoustics.jedn_silnika', wyliczone: ak.jedn_silnika === 'dB' ? widmoA(ak.lw_vars, 'dB') : null, opisWyl: 'po korekcie A' })}
-      <p class="podp" style="margin:6px 0 12px">Karty silników podają zwykle widmo w <b>dB(A)</b> (A-weighted sound power) - wtedy program nie dodaje korekty A. Dla widma w dB korekta A jest dodawana w każdym paśmie.</p>
-      ${pWidmo('acoustics.room_abs_vars', 'Pochłanianie wnętrza obudowy (Room Abs.) [dB]')}
+      <p class="podp" style="margin:6px 0 0">Karty silników podają zwykle widmo w <b>dB(A)</b> (A-weighted sound power) - wtedy program nie dodaje korekty A. Dla widma w dB korekta A jest dodawana w każdym paśmie.</p>
+      <div class="zalaczniki-male" style="margin-top:12px">${zalacznikJeden('meta.engine_wiz_path', 'obraz', 'Obraz do raportu (widmo, karta)')}${zalacznikJeden('meta.engine_pdf_path', 'pdf', 'Karta silnika PDF (na końcu raportu PDF)')}</div></div>
+    <div class="karta">
+      <div class="naglowek-karty"><h3>${ik('odswiez')}Pochłanianie wnętrza obudowy</h3><span class="podp">poziom ciśnienia wewnątrz: LpA = LwA + Room Abs.</span></div>
+      ${pWidmo('acoustics.room_abs_vars', 'Room Abs. [dB]')}
       <div class="sabine">
         <span class="etykieta" style="grid-column:1/-1">Kalkulator pochłaniania (wzór Sabine'a)</span>
         ${pLiczba('sabine.alfa_podl', 'α podłogi', '')}${pLiczba('sabine.alfa_scian', 'α ścian i sufitu', '')}${pLiczba('sabine.sabine_q', 'Kierunkowość Q', '')}${pLiczba('sabine.sabine_r', 'Odległość r', 'm')}
         <button class="btn btn-maly" id="sabine-oblicz">${ik('odswiez')} Oblicz i wpisz</button>
-      </div>
-      <div class="zalaczniki-male">${zalacznikJeden('meta.engine_wiz_path', 'obraz', 'Obraz do raportu (widmo, karta)')}${zalacznikJeden('meta.engine_pdf_path', 'pdf', 'Karta silnika PDF (na końcu raportu PDF)')}</div>
-    </div>
-
-    <div class="karta">
-      <div class="naglowek-karty"><h3><span class="nr">4</span>Moduły obudowy</h3><span class="podp">warstwy izolacyjne - z bazy materiałów albo własne</span></div>
-      <datalist id="lista-materialow">${Object.keys(BAZA.materials || {}).sort((a, b) => a.localeCompare(b, 'pl')).map((n) => `<option value="${esc(n)}">`).join('')}</datalist>
-      <div class="moduly">${INFO.moduly.map(kartaModulu).join('')}</div>
-    </div>
-
-    <div class="karta">
-      <div class="naglowek-karty"><h3><span class="nr">5</span>Chłodnica na wyrzucie</h3>
+      </div></div>`;
+  }
+  if (zakladka === 'chlodnica') {
+    return `<div class="karta">
+      <div class="naglowek-karty"><h3>${ik('wiatrak')}Chłodnica na wyrzucie</h3>
         <label class="zaznacz"><input type="checkbox" data-sc-bool="radiator.active" ${rad.active ? 'checked' : ''}> chłodnica aktywna</label></div>
       ${rad.active ? `<div class="pola p2">
           <div class="p-pole"><label class="etykieta">Z bazy</label><select class="pole" id="f-chlodnica"><option value="">— wybierz, aby wpisać dane —</option>${Object.keys(BAZA.radiators || {}).sort().map((n) => `<option ${n === rad.name ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></div>
           ${pTekst('radiator.name', 'Nazwa w raporcie')}</div>
         ${pWidmo('radiator.lw', 'Hałas własny chłodnicy Lw', { jedn: 'radiator.jedn', wyliczone: rad.jedn === 'dB' ? widmoA(rad.lw, 'dB') : null, opisWyl: 'po korekcie A' })}
         ${pWidmo('radiator.att', 'Tłumienie rdzenia chłodnicy (hałas silnika przez rdzeń) [dB]')}
-        ${!P.modules_active.wyrzut ? `<div class="uwaga-pola">${ik('uwaga')} Chłodnica jest liczona na module „Wyrzut” - włącz go w modułach obudowy.</div>` : ''}
-        <div class="zalaczniki-male">${zalacznikJeden('radiator.wiz_path', 'obraz', 'Obraz do raportu')}${zalacznikJeden('radiator.pdf_path', 'pdf', 'Karta chłodnicy PDF')}</div>`
-      : '<p class="podp" style="margin:0">Włącz, gdy wyrzut powietrza przechodzi przez chłodnicę - program doda hałas własny chłodnicy i hałas silnika przechodzący przez rdzeń.</p>'}
-    </div>
-  </div>
-  <aside class="wyniki"><div class="przewijane" id="wyniki"></div>
-    <div class="stopka">
-      <div class="przyciski-raportu"><button class="btn btn-hr btn-raport-duzy" id="generuj" title="Raport PDF (Ctrl+G)">${ik('dokument')} Raport PDF</button>
-        <button class="btn btn-raport-duzy" id="generuj-docx" title="Raport do edycji w Wordzie (Ctrl+Shift+G)">${ik('word')} DOCX</button></div>
-      <div class="podp" id="stopka-raportu"></div>
-    </div>
-  </aside>`;
-  rysujRewizje();
-  przelicz();
-  $('#generuj').onclick = () => generujRaport('pdf');
-  $('#generuj-docx').onclick = () => generujRaport('docx');
+        ${!P.modules_active.wyrzut ? `<div class="uwaga-pola">${ik('uwaga')} Chłodnica jest liczona na module „Wyrzut” - włącz go w zakładce Wyrzut.</div>` : ''}
+        <div class="zalaczniki-male" style="margin-top:12px">${zalacznikJeden('radiator.wiz_path', 'obraz', 'Obraz do raportu')}${zalacznikJeden('radiator.pdf_path', 'pdf', 'Karta chłodnicy PDF')}</div>`
+      : '<p class="podp" style="margin:0">Włącz, gdy wyrzut powietrza przechodzi przez chłodnicę - program doda hałas własny chłodnicy i hałas silnika przechodzący przez rdzeń.</p>'}</div>`;
+  }
+  return kartaModulu(zakladka);
 }
 
 function kartaModulu(k) {
   const akt = !!P.modules_active[k], md = P.mod_dims[k], warstwy = P.layers[k] || [], zal = P.mod_attachments[k] || [];
   const s = W?.ok ? W.powierzchnie[k] : null;
-  const r = W?.ok && W.moduly[k] ? W.moduly[k].r : null;
-  const opis = !akt ? 'wyłączony' : `${k === 'wydech' ? `${md.qty} szt.` : `S = ${s === null ? '…' : lp(s)} m²`} · warstwy: ${warstwy.length}${r ? ` · R śr. ${lp(r.reduce((a, b) => a + b, 0) / 8, 1)} dB` : ''}`;
-  return `<details class="modul ${akt ? 'aktywny' : ''}" data-modul="${k}" ${rozwiniete.has(k) && akt ? 'open' : ''}>
-    <summary><label class="zaznacz" onclick="event.stopPropagation()"><input type="checkbox" data-sc-bool="modules_active.${k}" ${akt ? 'checked' : ''}></label>
-      <b>${MODULY[k]}</b><span class="podp">${opis}</span>${ik('dalej', 'strzalka')}</summary>
-    ${akt ? `<div class="tresc-modulu">
-      ${AUTO_S.includes(k) ? `<p class="podp" style="margin:0 0 8px">Powierzchnia z wymiarów obudowy${k === 'sciana' ? ' (minus drzwi, czerpnia i wyrzut)' : ''}: <b class="s-modulu">${s === null ? '…' : lp(s)} m²</b></p>`
-        : `<div class="pola p4">${k !== 'wydech' ? `${pLiczba(`mod_dims.${k}.w`, 'Szerokość', 'm')}${pLiczba(`mod_dims.${k}.h`, 'Wysokość', 'm')}` : ''}${pLiczba(`mod_dims.${k}.qty`, k === 'wydech' ? 'Liczba kominów' : 'Ilość', 'szt.')}
-          ${k !== 'wydech' ? `<div class="p-pole"><label class="etykieta">Powierzchnia</label><div class="wartosc-pola">${s === null ? '…' : lp(s)} m²</div></div>` : ''}</div>`}
+  const u = W?.ok ? W.punkty[0]?.moduly[k] : null;
+  return `<div class="karta modul-karta" data-modul="${k}">
+    <div class="naglowek-karty"><h3>${ik('warstwy')}${MODULY[k]}</h3>
+      <label class="zaznacz"><input type="checkbox" data-sc-bool="modules_active.${k}" ${akt ? 'checked' : ''}> uwzględnij w obliczeniach</label></div>
+    ${!akt ? `<p class="podp" style="margin:0">Moduł wyłączony - nie jest liczony ani opisany w raporcie.${k === 'wydech' ? ' Włącz, gdy komin wydechu wychodzi z obudowy.' : ''}</p></div>` : `
+    <div class="podsumowanie-modulu"><span>Powierzchnia <b class="s-modulu">${k === 'wydech' ? '—' : s === null ? '…' : `${lp(s)} m²`}</b></span>
+      <span>Izolacyjność śr. <b class="r-modulu">${W?.ok && W.moduly[k] ? `${lp(W.moduly[k].r.reduce((a, b) => a + b, 0) / 8, 1)} dB` : '…'}</b></span>
+      <span>Udział w punkcie ${esc(P.points[0]?.name || '')} <b class="u-modulu">${u ? `${lp(u.udzial, 1)} dB(A) · ${lp(u.procent, 0)}%` : '…'}</b></span></div>
+    <div class="tresc-modulu">
+      ${AUTO_S.includes(k) ? `<p class="podp" style="margin:0">Powierzchnia z wymiarów obudowy (zakładka Obudowa)${k === 'sciana' ? ' minus drzwi, czerpnia i wyrzut' : ''}.</p>`
+        : `<div class="pola p4">${k !== 'wydech' ? `${pLiczba(`mod_dims.${k}.w`, 'Szerokość', 'm')}${pLiczba(`mod_dims.${k}.h`, 'Wysokość', 'm')}` : ''}${pLiczba(`mod_dims.${k}.qty`, k === 'wydech' ? 'Liczba kominów' : 'Ilość', 'szt.')}</div>`}
       ${Z_KIERUNKIEM.includes(k) ? `<div class="pola p4"><div class="p-pole"><label class="etykieta">Kierunek wylotu</label>${pSegment(`mod_dims.${k}.kierunek`, [['Poziomy', 'Poziomy'], ['Pionowy w górę', 'Pionowo w górę']])}</div>
         ${pLiczba(`mod_dims.${k}.wysokosc`, 'Wysokość nad punktem', 'm', { podpowiedz: '0 = na wysokości punktu' })}</div>` : ''}
       ${k === 'wydech' ? pWidmo('acoustics.exhaust_lw_vars', 'Widmo mocy akustycznej wydechu Lw (przed tłumikiem)', { jedn: 'acoustics.jedn_wydechu', wyliczone: P.acoustics.jedn_wydechu === 'dB' ? widmoA(P.acoustics.exhaust_lw_vars, 'dB') : null, opisWyl: 'po korekcie A' }) : ''}
+    </div></div>
+    <div class="karta">
+      <div class="naglowek-karty"><h3>${ik('warstwy')}Warstwy ${k === 'wydech' ? '(tłumiki spalin)' : 'izolacyjne'}</h3><span class="podp">z bazy materiałów albo własne - sumowane energetycznie</span></div>
+      <datalist id="lista-materialow">${Object.keys(BAZA.materials || {}).sort((a, b) => a.localeCompare(b, 'pl')).map((n) => `<option value="${esc(n)}">`).join('')}</datalist>
       <div class="warstwy">${warstwy.map((w, i) => wierszWarstwy(k, w, i, warstwy.length)).join('') || `<p class="podp" style="margin:4px 0">${k === 'wydech' ? 'Brak tłumika - dodaj tłumik spalin jako warstwę.' : 'Brak warstw - moduł liczony jak otwór (bez izolacyjności).'}</p>`}</div>
-      <div class="akcje-modulu"><button class="btn btn-maly" data-dodaj-warstwe="${k}">${ik('plus')} Dodaj warstwę</button>
-        <button class="btn btn-maly" data-zal-modulu="${k}" data-typ="obraz">${ik('obraz')} Obraz do raportu</button>
-        <button class="btn btn-maly" data-zal-modulu="${k}" data-typ="pdf">${ik('dokument')} Karta PDF</button></div>
-      ${zal.length ? `<div class="lista-zalacznikow">${zal.map((a, i) => `<span class="znacznik akt ${MINIATURY_BRAK.has(a.path) ? 'brak' : ''}">${ik(a.type === 'Dokument (PDF)' ? 'dokument' : 'obraz')} ${esc(nazwaPliku(a.path))}<button class="btn btn-bez btn-ikona" data-usun-zal-modulu="${k}" data-i="${i}" title="Usuń">${ik('x')}</button></span>`).join('')}</div>` : ''}
-    </div>` : ''}
-  </details>`;
+      <div class="akcje-modulu" style="margin-top:10px"><button class="btn btn-maly" data-dodaj-warstwe="${k}">${ik('plus')} Dodaj warstwę</button></div></div>
+    <div class="karta">
+      <div class="naglowek-karty"><h3>${ik('obraz')}Załączniki do raportu</h3><span class="podp">obrazy w opisie modułu, karty PDF na końcu raportu PDF</span></div>
+      <div class="akcje-modulu"><button class="btn btn-maly" data-zal-modulu="${k}" data-typ="obraz">${ik('obraz')} Dodaj obraz</button>
+        <button class="btn btn-maly" data-zal-modulu="${k}" data-typ="pdf">${ik('dokument')} Dodaj kartę PDF</button></div>
+      ${zal.length ? `<div class="lista-zalacznikow" style="margin-top:10px">${zal.map((a, i) => `<span class="znacznik akt ${MINIATURY_BRAK.has(a.path) ? 'brak' : ''}">${ik(a.type === 'Dokument (PDF)' ? 'dokument' : 'obraz')} ${esc(nazwaPliku(a.path))}<button class="btn btn-bez btn-ikona" data-usun-zal-modulu="${k}" data-i="${i}" title="Usuń">${ik('x')}</button></span>`).join('')}</div>` : ''}`}
+  </div>`;
 }
 const MINIATURY_BRAK = new Set();
 
@@ -561,7 +605,22 @@ function zalacznikJeden(sc, typ, etykieta) {
     <button class="btn btn-maly" data-zal-wybierz="${sc}" data-typ="${typ}">${p ? 'Zmień' : 'Wybierz…'}</button>${p ? `<button class="btn btn-maly btn-ikona" data-zal-usun="${sc}" title="Usuń">${ik('x')}</button>` : ''}</div>`;
 }
 
-function przerysujDane() { const przew = $('#dane')?.scrollTop || 0; rysujObliczenia(); if ($('#dane')) $('#dane').scrollTop = przew; }
+function przerysujDane() {
+  const t = $('#tresc-zakladki');
+  if (!t) return rysujObliczenia();
+  const przew = $('#dane').scrollTop;
+  t.innerHTML = trescZakladki();
+  if (zakladka === 'projekt') rysujRewizje();
+  $('#dane').scrollTop = przew;
+  odswiezZakladki();
+  przeliczPozniej(0);
+}
+function pokazZakladke(z) {
+  zakladka = z;
+  $$('.zakladki-obl button').forEach((b) => b.classList.toggle('akt', b.dataset.zakl === z));
+  przerysujDane();
+  $('#dane').scrollTop = 0;
+}
 
 const widokObl = $('#widok-obliczenia');
 widokObl.addEventListener('input', (e) => {
@@ -579,8 +638,6 @@ widokObl.addEventListener('change', (e) => {
   const t = e.target;
   if (t.dataset.scBool) {
     ustaw(t.dataset.scBool, t.checked);
-    const k = t.dataset.scBool.split('.')[1];
-    if (t.dataset.scBool.startsWith('modules_active') && t.checked) rozwiniete.add(k);
     zmiana(); przerysujDane();
     return;
   }
@@ -596,11 +653,9 @@ widokObl.addEventListener('change', (e) => {
     if (BAZA.materials?.[t.value]) { P.layers[k][+i] = warstwaZBazy(t.value); zmiana(); przerysujDane(); }
   }
 });
-widokObl.addEventListener('toggle', (e) => {
-  const d = e.target.closest?.('details[data-modul]');
-  if (d) d.open ? rozwiniete.add(d.dataset.modul) : rozwiniete.delete(d.dataset.modul);
-}, true);
 widokObl.addEventListener('click', async (e) => {
+  const zb = e.target.closest('[data-zakl]');
+  if (zb) { pokazZakladke(zb.dataset.zakl); return; }
   const b = e.target.closest('[data-seg] button');
   if (b) {
     ustaw(b.closest('[data-seg]').dataset.seg, b.dataset.v);
@@ -619,7 +674,7 @@ widokObl.addEventListener('click', async (e) => {
     P.acoustics.room_abs_vars = Array(8).fill(Math.round(r.room_abs * 100) / 100);
     zmiana(); przerysujDane();
     toast(`Pochłanianie wnętrza: <b>${lp(r.room_abs)} dB</b> (ᾱ = ${lp(r.alfa, 3)}, R = ${lp(r.stala, 1)} m²) - wpisane we wszystkich pasmach.`, 'ok', null, 6000);
-  } else if (ds.dodajWarstwe) { rozwiniete.add(ds.dodajWarstwe); P.layers[ds.dodajWarstwe].push(nowaWarstwa()); zmiana(); przerysujDane(); $$(`[data-modul="${ds.dodajWarstwe}"] .nazwa-warstwy`).at(-1)?.focus(); }
+  } else if (ds.dodajWarstwe) { P.layers[ds.dodajWarstwe].push(nowaWarstwa()); zmiana(); przerysujDane(); $$(`[data-modul="${ds.dodajWarstwe}"] .nazwa-warstwy`).at(-1)?.focus(); }
   else if (ds.usunWarstwe) { const [k, i] = ds.usunWarstwe.split('.'); P.layers[k].splice(+i, 1); zmiana(); przerysujDane(); }
   else if (ds.warstwaGora || ds.warstwaDol) {
     const [k, i] = (ds.warstwaGora || ds.warstwaDol).split('.'), a = +i, b2 = ds.warstwaGora ? a - 1 : a + 1, l = P.layers[k];
@@ -703,14 +758,14 @@ async function przelicz() {
   W = await api('oblicz', P);
   if (!W) return;
   rysujWyniki();
-  // powierzchnie i opisy modułów zależą od wyników - odświeżane bez przerysowania pól (kursor zostaje)
-  for (const k of INFO.moduly) {
-    const sp = $(`[data-modul="${k}"] > summary .podp`);
-    if (sp && W.ok) {
-      const md = P.mod_dims[k], r = W.moduly[k]?.r;
-      sp.textContent = !P.modules_active[k] ? 'wyłączony' : `${k === 'wydech' ? `${md.qty} szt.` : `S = ${lp(W.powierzchnie[k])} m²`} · warstwy: ${(P.layers[k] || []).length}${r ? ` · R śr. ${lp(r.reduce((a, b) => a + b, 0) / 8, 1)} dB` : ''}`;
-      $$(`[data-modul="${k}"] .wartosc-pola, [data-modul="${k}"] .s-modulu`).forEach((x) => x.textContent = `${lp(W.powierzchnie[k])} m²`);
-    }
+  odswiezZakladki();
+  const k = zakladka;
+  if (W.ok && INFO.moduly.includes(k) && P.modules_active[k]) {
+    const u = W.punkty[0]?.moduly[k], r = W.moduly[k]?.r;
+    const ust = (sel, t) => { const x = $(sel); if (x) x.textContent = t; };
+    ust('.s-modulu', k === 'wydech' ? '—' : `${lp(W.powierzchnie[k])} m²`);
+    ust('.r-modulu', r ? `${lp(r.reduce((a, b) => a + b, 0) / 8, 1)} dB` : '—');
+    ust('.u-modulu', u ? `${lp(u.udzial, 1)} dB(A) · ${lp(u.procent, 0)}%` : '—');
   }
 }
 
@@ -902,7 +957,7 @@ async function uzyjZBazy(rodzaj, nazwa) {
   if (!k) return;
   P.modules_active[k] = true;
   P.layers[k].push(warstwaZBazy(nazwa));
-  rozwiniete.add(k);
+  zakladka = k;
   zmiana();
   pokaz('obliczenia');
   toast(`Dodano warstwę <b>${esc(nazwa)}</b> do modułu ${MODULY[k]}.`, 'ok', null, 3000);

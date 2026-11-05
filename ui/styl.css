@@ -453,3 +453,19 @@ details.modul:not(.aktywny) > summary b { color: var(--muted); font-weight: 500;
 .pasek-u i { display: block; height: 100%; border-radius: 6px; background: color-mix(in srgb, var(--kolor) 55%, transparent); }
 .udzial.glowny .pasek-u i { background: var(--kolor); }
 .udzial.glowny > span:first-child { color: var(--text); font-weight: 600; }
+
+/* ------------------------------------------------------------------ Akustyka: zakładki ekranu obliczeń */
+.zakladki-obl { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; margin-bottom: 4px;
+  border-radius: 14px; background: color-mix(in srgb, var(--surface) 92%, transparent); border: 1px solid var(--border); backdrop-filter: blur(8px); }
+.zakladki-obl button { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 8px; align-items: center; text-align: left;
+  padding: 7px 12px 7px 10px; border-radius: 10px; border: 1px solid transparent; background: none; color: var(--text-2); cursor: pointer; font: inherit; font-size: 0.86rem; }
+.zakladki-obl button svg { grid-row: span 2; width: 17px; height: 17px; color: var(--muted); }
+.zakladki-obl button small { font-size: 0.7rem; color: var(--muted); font-family: var(--font-mono); line-height: 1.1; }
+.zakladki-obl button:hover { background: var(--bg-2); color: var(--text); }
+.zakladki-obl button.akt { background: color-mix(in srgb, var(--kolor) 15%, transparent); border-color: color-mix(in srgb, var(--kolor) 40%, transparent); color: var(--text); font-weight: 600; }
+.zakladki-obl button.akt svg { color: var(--kolor); }
+.zakladki-obl button.wylaczony span { color: var(--muted); }
+.zakladki-obl button.dominujacy small { color: var(--zolty-tekst); font-weight: 700; }
+.podsumowanie-modulu { display: flex; flex-wrap: wrap; gap: 8px 22px; padding: 10px 12px; margin-bottom: 12px; border-radius: 10px; background: var(--bg-2); font-size: 0.84rem; color: var(--text-2); }
+.podsumowanie-modulu b { font-family: var(--font-mono); color: var(--text); margin-left: 4px; }
+.modul-karta .tresc-modulu { padding: 0; }

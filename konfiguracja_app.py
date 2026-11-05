@@ -4,11 +4,15 @@ import sys
 # ==========================================
 # KONFIGURACJA I METADANE
 # ==========================================
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 DB_VERSION = "0"  # wersja bazy, gdy lokalny plik jej nie zawiera (baza z panelu diamel.pl ma numer wersji 1, 2, 3...)
 BUILD_DATE = "2026-11-05 12:00"
 
 CHANGELOG = """
+v2.0.1 (2026-11-05)
+- Ekran obliczeń w zakładkach: Projekt, Obudowa i punkty, Silnik, osobno każdy moduł (ściany, podłoga, sufit, drzwi,
+  czerpnia, wyrzut, wydech) i Chłodnica. Przy module - jego udział w hałasie; moduł, który hałasuje najbardziej, wyróżniony.
+
 v2.0.0 (2026-11-05)
 - Nowy program: okno w stylu Korektora HR i Kalkulatora Rozruchu, wyniki liczone na bieżąco podczas wpisywania.
 - Logowanie kontem Diamel przy uruchomieniu (jak w Korektorze HR): raporty na papierze firmowym Twojej firmy,
