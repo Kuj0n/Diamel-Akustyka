@@ -4,11 +4,15 @@ import sys
 # ==========================================
 # KONFIGURACJA I METADANE
 # ==========================================
-VERSION = "2.0.9"
+VERSION = "2.0.10"
 DB_VERSION = "0"  # wersja bazy, gdy lokalny plik jej nie zawiera (baza z panelu diamel.pl ma numer wersji 1, 2, 3...)
-BUILD_DATE = "2026-11-06 19:30"
+BUILD_DATE = "2026-11-06 20:00"
 
 CHANGELOG = """
+v2.0.10 (2026-11-06)
+- Punkty pomiarowe: standardowo 1,5 m nad terenem, w podanej odległości od obudowy (zwykle 1 m). Wysokość punktu nie
+  jest już osobnym polem przy wydechu; opis w raporcie (dane wejściowe i założenia).
+
 v2.0.9 (2026-11-06)
 - Raport, pierwsza strona: bez linii o największym udziale w hałasie (jest w wynikach przy każdym punkcie).
 - Raport: rozdział nie zaczyna się już kilkoma linijkami na dole strony - nagłówek, opis i pierwsza tabela przechodzą

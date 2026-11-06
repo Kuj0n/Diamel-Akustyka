@@ -68,7 +68,7 @@ NOWY_PROJEKT = {
                   "wielkosc_wydechu": "Lp1m"},
 }
 # wydech (od 2.0.2): położenie wylotu -> wynik po stronie komina (źródło punktowe); pionowo w górę jak zwykle komin nad dachem
-NOWY_PROJEKT["mod_dims"]["wydech"].update({"kierunek": obliczenia.PIONOWO, "nad_dachem": 1.0, "od_sciany": 1.0, "wys_punktu": obliczenia.WYS_PUNKTU})
+NOWY_PROJEKT["mod_dims"]["wydech"].update({"kierunek": obliczenia.PIONOWO, "nad_dachem": 1.0, "od_sciany": 1.0})
 
 
 def wez_krotke(v):

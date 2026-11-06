@@ -516,7 +516,7 @@ function trescZakladki() {
       <div class="naglowek-karty"><h3>${ik('obudowa')}Wymiary obudowy</h3><span class="podp">ściany, podłoga i sufit liczone z wymiarów</span></div>
       <div class="pola">${pLiczba('dimensions.kont_l', 'Długość', 'm')}${pLiczba('dimensions.kont_w', 'Szerokość', 'm')}${pLiczba('dimensions.kont_h', 'Wysokość', 'm')}</div></div>
     <div class="karta">
-      <div class="naglowek-karty"><h3>${ik('info')}Punkty pomiarowe</h3><span class="podp">powierzchnia pomiarowa wg ISO 3744</span></div>
+      <div class="naglowek-karty"><h3>${ik('info')}Punkty pomiarowe</h3><span class="podp">odległość od obudowy · pomiar 1,5 m nad terenem · ISO 3744</span></div>
       <table class="tabela-punktow"><thead><tr><th>Punkt pomiarowy</th><th>Odległość</th><th>Wymagany poziom</th><th></th></tr></thead><tbody>
         ${P.points.map((pt, i) => `<tr><td><input class="pole" data-sc="points.${i}.name" value="${esc(pt.name)}" placeholder="np. Front 1 m"></td>
           <td><div class="z-jednostka"><input class="pole" data-sc="points.${i}.d" value="${esc(pt.d)}" inputmode="decimal"><span class="jedn">m</span></div></td>
@@ -599,8 +599,8 @@ function polaWydechu() {
   return `<div class="pola p4"><div class="p-pole"><label class="etykieta">Kierunek wylotu</label>${pSegment('mod_dims.wydech.kierunek', [['Poziomy', 'Poziomo'], ['Pionowy w górę', 'W górę']])}</div>
       ${pLiczba('mod_dims.wydech.nad_dachem', 'Wylot nad dachem obudowy', 'm', { podpowiedz: 'np. 1,8' })}
       ${pLiczba('mod_dims.wydech.od_sciany', 'Wylot od najbliższej ściany', 'm', { podpowiedz: 'poziomo, np. 1,2' })}
-      ${pLiczba('mod_dims.wydech.wys_punktu', 'Wysokość punktu pomiaru', 'm', { podpowiedz: '1,5' })}</div>
-    <p class="podp" style="margin:2px 0 8px">Wylot = miejsce, gdzie spaliny wychodzą w powietrze (koniec kolana / komina). Program liczy wydech dodatkowo jako źródło punktowe
+    </div>
+    <p class="podp" style="margin:2px 0 8px">Wylot = miejsce, gdzie spaliny wychodzą w powietrze (koniec kolana / komina). Punkt pomiaru: 1,5 m nad terenem. Program liczy wydech dodatkowo jako źródło punktowe
       w punkcie po stronie komina - o zgodności decyduje gorszy z dwóch wyników.<span class="geo-wydechu">${opisGeoWydechu()}</span></p>
     ${stary ? `<div class="uwaga-pola">${ik('info')} Projekt sprzed wersji 2.0.2 - podaj położenie wylotu, żeby policzyć poziom po stronie komina (teraz tylko średnia wokół obudowy, wysokość nad punktem ${lc(liczbaJs(P.mod_dims.wydech.wysokosc))} m).</div>` : ''}
     <div class="widmo-nag" style="margin-top:6px"><span class="etykieta">Widmo hałasu wydechu przed tłumikiem</span>${pSegment('acoustics.wielkosc_wydechu', [['Lp1m', 'Lp@1m (karta tłumika)'], ['Lw', 'Lw (moc)']])}</div>

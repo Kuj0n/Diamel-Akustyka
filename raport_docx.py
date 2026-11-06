@@ -59,7 +59,7 @@ TEKSTY = {
         "cel_chl": ", hałas własny chłodnicy", "cel_wyd": ", wydech silnika",
         "parametr": "Parametr", "wartosc": "Wartość", "pasmo": "Pasmo [Hz]", "suma": "Suma",
         "typ": "Typ instalacji", "wymiary": "Wymiary obudowy (dł. × szer. × wys.)", "s_obudowy": "Powierzchnia promieniująca (ściany + dach)",
-        "punkty": "Punkty pomiarowe", "punkt_w": "{n}: ≤ {l} dB(A) w odległości {d} m",
+        "punkty": "Punkty pomiarowe", "punkt_w": "{n}: ≤ {l} dB(A) w odległości {d} m od obudowy, 1,5 m nad terenem",
         "widmo_opis": "Widmo mocy akustycznej silnika Lw w pasmach oktawowych{z}. Całkowita moc akustyczna silnika:",
         "widmo_z_karty": " (karta producenta)", "lw_podane": "Lw [{j}]", "korekta_a": "Korekta A [dB]", "lwa": "LwA [dB(A)]",
         "lwa_suma": "Całkowita moc akustyczna silnika LwA", "lpa_suma": "Całkowity poziom ciśnienia wewnątrz obudowy LpA",
@@ -98,7 +98,7 @@ TEKSTY = {
             "Widmo wydechu podane jako poziom ciśnienia 1 m od wylotu (karta tłumika) przeliczono na moc akustyczną: Lw = Lp@1m + 10·lg(4π) ≈ Lp@1m + 11 dB (źródło punktowe w wolnym polu). Wydech oceniono dodatkowo po stronie komina jako źródło punktowe: Lp = LwA za tłumikiem − 10·lg(4π·r²) − 3 dB (wylot pionowo w górę), gdzie r to odległość wylotu od punktu; pozostałe moduły jak wyżej. O ocenie punktu decyduje wyższy z dwóch poziomów.",
             "Poziom w punkcie pomiarowym wg ISO 3744: Lp(d) = 10·lg(ΣW / S_pom), gdzie S_pom to powierzchnia prostopadłościanu pomiarowego (dł.+2d × szer.+2d × wys.+d, bez podłogi). Udział modułu w punkcie: 10·lg(W_modułu / S_pom) - udziały wszystkich modułów sumują się energetycznie do poziomu w punkcie.",
         ],
-        "zalozenia": "Założenia zachowawcze: nie odjęto 6 dB przy przenikaniu przez przegrodę (EN 12354-4: na ścianę pada ćwierć energii pola rozproszonego) - wynik ma ok. 6 dB zapasu; warstwy przegrody sumowane energetycznie (w rzeczywistości izolacyjność przegrody wielowarstwowej jest zwykle większa); podłoga liczona jako promieniująca do punktu pomiarowego. Wynik nie obejmuje hałasu tła, odbić od pobliskich budynków ani drgań przenoszonych przez fundament.",
+        "zalozenia": "Punkty pomiarowe: w podanej odległości od obudowy, na wysokości 1,5 m nad terenem. Założenia zachowawcze: nie odjęto 6 dB przy przenikaniu przez przegrodę (EN 12354-4: na ścianę pada ćwierć energii pola rozproszonego) - wynik ma ok. 6 dB zapasu; warstwy przegrody sumowane energetycznie (w rzeczywistości izolacyjność przegrody wielowarstwowej jest zwykle większa); podłoga liczona jako promieniująca do punktu pomiarowego. Wynik nie obejmuje hałasu tła, odbić od pobliskich budynków ani drgań przenoszonych przez fundament.",
         "zal_nazwy": {"engine": "Widmo silnika", "radiator": "Chłodnica"},
         "strona": "Strona", "z_stron": "z", "stopka": "Raport akustyczny",
     },
@@ -126,7 +126,7 @@ TEKSTY = {
         "cel_chl": ", radiator self-noise", "cel_wyd": ", engine exhaust",
         "parametr": "Parameter", "wartosc": "Value", "pasmo": "Band [Hz]", "suma": "Total",
         "typ": "Installation type", "wymiary": "Enclosure dimensions (L × W × H)", "s_obudowy": "Radiating surface (walls + roof)",
-        "punkty": "Measurement points", "punkt_w": "{n}: ≤ {l} dB(A) at {d} m",
+        "punkty": "Measurement points", "punkt_w": "{n}: ≤ {l} dB(A) at {d} m from the enclosure, 1.5 m above ground",
         "widmo_opis": "Engine sound power level spectrum Lw in octave bands{z}. Total engine sound power level:",
         "widmo_z_karty": " (manufacturer's data sheet)", "lw_podane": "Lw [{j}]", "korekta_a": "A-weighting [dB]", "lwa": "LwA [dB(A)]",
         "lwa_suma": "Total engine sound power level LwA", "lpa_suma": "Total sound pressure level inside the enclosure LpA",
@@ -165,7 +165,7 @@ TEKSTY = {
             "The exhaust spectrum given as sound pressure 1 m from the outlet (silencer data sheet) was converted to sound power: Lw = Lp@1m + 10·lg(4π) ≈ Lp@1m + 11 dB (point source, free field). The exhaust was additionally assessed on the stack side as a point source: Lp = LwA after the silencer − 10·lg(4π·r²) − 3 dB (vertical outlet), r being the distance from the outlet to the point; other modules as above. The higher of the two levels governs the assessment of the point.",
             "Level at the measurement point per ISO 3744: Lp(d) = 10·lg(ΣW / S_meas), where S_meas is the area of the measurement box (L+2d × W+2d × H+d, without floor). Module contribution at the point: 10·lg(W_module / S_meas) - the contributions of all modules add up energetically to the level at the point.",
         ],
-        "zalozenia": "Conservative assumptions: the 6 dB transmission term (EN 12354-4: a quarter of the diffuse field energy is incident on the wall) was not subtracted - the result has a margin of about 6 dB; partition layers added energetically (in reality the insulation of a multi-layer partition is usually higher); the floor is treated as radiating to the measurement point. The result does not include background noise, reflections from nearby buildings or vibration transmitted through the foundation.",
+        "zalozenia": "Measurement points: at the given distance from the enclosure, 1.5 m above ground. Conservative assumptions: the 6 dB transmission term (EN 12354-4: a quarter of the diffuse field energy is incident on the wall) was not subtracted - the result has a margin of about 6 dB; partition layers added energetically (in reality the insulation of a multi-layer partition is usually higher); the floor is treated as radiating to the measurement point. The result does not include background noise, reflections from nearby buildings or vibration transmitted through the foundation.",
         "zal_nazwy": {"engine": "Engine spectrum", "radiator": "Radiator"},
         "strona": "Page", "z_stron": "of", "stopka": "Acoustic report",
     },
@@ -724,7 +724,7 @@ class Raport:
                                           h=t["wysokosc"].format(h=n.g(wys)) if wys > 0 else ""))
             if geo:
                 self.akapit(t["wyd_geo"].format(nd=n.g(obliczenia.liczba(md.get("nad_dachem"), 0)), os=n.g(obliczenia.liczba(md.get("od_sciany"), 0)),
-                                                wp=n.g(obliczenia.liczba(md.get("wys_punktu"), obliczenia.WYS_PUNKTU))), 9, kolor=SZARY, po=4).paragraph_format.keep_with_next = True
+                                                wp=n.g(obliczenia.WYS_PUNKTU)), 9, kolor=SZARY, po=4).paragraph_format.keep_with_next = True
             j = "dB" if dB else "dB(A)"
             if w["wydech_lp1m"]:
                 wiersze = [(t["wyd_lp"].format(j=j), w["wydech_wpisane"], None), (t["wyd_plus"], [obliczenia.LP_NA_LW] * 8, None),

@@ -109,7 +109,7 @@ def test_wydech_komin():
     assert abs(w["wydech_lw_a_po_suma"] - db(po)) < 1e-9
     assert abs(db(po) - 10 * math.log10(4 * math.pi) - 85) < 1.0  # jak prognoza AXCES: 85 dB(A) 1 m od wylotu
     # położenie wylotu: dach 3 m + 1,8 m, punkt 1,5 m -> 3,3 m nad punktem; 1,2 m od ściany + d 1 m
-    p["mod_dims"]["wydech"].update({"nad_dachem": "1,8", "od_sciany": 1.2, "wys_punktu": 1.5})
+    p["mod_dims"]["wydech"].update({"nad_dachem": "1,8", "od_sciany": 1.2})  # punkt pomiaru zawsze 1,5 m nad terenem
     w = obliczenia.oblicz(p)
     pt = w["punkty"][0]
     r = math.sqrt(2.2 ** 2 + 3.3 ** 2)

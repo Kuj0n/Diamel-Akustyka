@@ -35,7 +35,7 @@ Z_KIERUNKIEM = ("wydech", "czerpnia", "wyrzut")       # kierunek wylotu i wysoko
 PIONOWO = "Pionowy w górę"
 JEDNOSTKI = ("dBA", "dB")
 LP_NA_LW = 10 * math.log10(4 * math.pi)  # ≈ 11 dB: Lw = Lp@1m + 10·lg(4π·1²) - źródło punktowe w wolnym polu (karty tłumików podają Lp@1m)
-WYS_PUNKTU = 1.5  # domyślna wysokość punktu pomiaru nad terenem [m]
+WYS_PUNKTU = 1.5  # pomiar standardowo 1,5 m nad terenem (odległość punktu - od obudowy, zwykle 1 m)
 
 
 def wydech_geometria(md, h_obudowy, d):
@@ -46,7 +46,7 @@ def wydech_geometria(md, h_obudowy, d):
     nad_dachem = str(md.get("nad_dachem", "")).strip()
     if nad_dachem == "":
         return None
-    v = max(0.0, h_obudowy + liczba(nad_dachem, 0.0) - liczba(md.get("wys_punktu"), WYS_PUNKTU))
+    v = max(0.0, h_obudowy + liczba(nad_dachem, 0.0) - WYS_PUNKTU)
     poziomo = max(0.0, liczba(md.get("od_sciany"), 0.0)) + d
     return v, max(0.5, math.sqrt(poziomo ** 2 + v ** 2))
 
