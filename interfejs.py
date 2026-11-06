@@ -435,17 +435,22 @@ class Api:
 
     @staticmethod
     def _zalaczniki_raportu(stan, w):
-        """Obrazy do treści raportu i karty PDF na koniec - tylko istniejące pliki, moduły / chłodnica - tylko aktywne."""
+        """Obrazy do treści raportu i karty PDF wg rozdziałów (engine / radiator / moduly / wydech) - tylko istniejące pliki, aktywne moduły."""
         m, rad = stan.get("meta", {}), stan.get("radiator", {})
         jest = lambda p: bool(p) and os.path.isfile(p)
         obrazy = {"engine": m.get("engine_wiz_path") if jest(m.get("engine_wiz_path")) else "",
                   "radiator": rad.get("wiz_path") if w["chlodnica"] and jest(rad.get("wiz_path")) else "", "moduly": {}}
-        pdf = [p for p in (m.get("engine_pdf_path"), rad.get("pdf_path") if w["chlodnica"] else "") if jest(p)]
+        karty = {"engine": [m["engine_pdf_path"]] if jest(m.get("engine_pdf_path")) else [],
+                 "radiator": [rad["pdf_path"]] if w["chlodnica"] and jest(rad.get("pdf_path")) else [], "moduly": [], "wydech": []}
         for k in w["moduly"]:
             for a in (stan.get("mod_attachments") or {}).get(k, []):
                 if jest(a.get("path")):
-                    (obrazy["moduly"].setdefault(k, []) if a.get("type") != DOKUMENT else pdf).append(a["path"])
-        return obrazy, pdf
+                    if a.get("type") != DOKUMENT:
+                        obrazy["moduly"].setdefault(k, []).append(a["path"])
+                    else:
+                        karty["wydech" if k == "wydech" else "moduly"].append(a["path"])
+        obrazy["karty"] = {k: v for k, v in karty.items() if v}
+        return obrazy, obrazy["karty"]
 
     def generuj_raport(self, stan, format_="pdf"):
         """Raport PDF (przez Microsoft Word, z kartami producentów na końcu) albo DOCX; nagłówek i stopka z szablonu."""
@@ -467,6 +472,9 @@ class Api:
         if not sciezka.lower().endswith(rozszerzenie):
             sciezka += rozszerzenie
         obrazy, karty = self._zalaczniki_raportu(stan, wyniki)
+        obrazy["karty_w_pdf"] = format_ == "pdf" and bool(self.program["pdf_zalaczniki"])
+        if not self.program["pdf_zalaczniki"] and format_ == "pdf":
+            obrazy["karty"] = {}
         szablon = self._szablon()
         if szablon and not os.path.isfile(szablon):
             return {"ok": False, "blad": f"Nie znaleziono szablonu raportu: {szablon} - wybierz go ponownie w Ustawieniach albo usuń."}
@@ -480,7 +488,7 @@ class Api:
                 finally:
                     os.remove(tymczasowy)
                 if karty and self.program["pdf_zalaczniki"]:
-                    pominiete = raport_docx.dolacz_pdf(sciezka, karty)
+                    pominiete = raport_docx.wstaw_karty(sciezka, karty)
             else:
                 raport_docx.generuj(sciezka, stan, wyniki, obrazy, szablon)
         except PermissionError:
@@ -495,7 +503,7 @@ class Api:
             os.startfile(sciezka)
         brak = [os.path.basename(p) for p in self._sciezki_zalacznikow(stan) if not os.path.isfile(p)]
         return {"ok": True, "plik": sciezka, "pominiete": brak + pominiete,
-                "karty": len(karty) if format_ == "pdf" and self.program["pdf_zalaczniki"] else 0}
+                "karty": sum(len(v) for v in karty.values()) if format_ == "pdf" and self.program["pdf_zalaczniki"] else 0}
 
     # ------------------------------------------------------------------ pliki, strony, zgłoszenia
 

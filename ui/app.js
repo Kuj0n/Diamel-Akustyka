@@ -530,7 +530,7 @@ function trescZakladki() {
       <div class="naglowek-karty"><h3>${ik('silnik')}Silnik - źródło hałasu</h3><span class="podp">${esc(m.silnik_typ || 'moc akustyczna Lw w pasmach oktawowych')}</span></div>
       ${pWidmo('acoustics.lw_vars', 'Widmo mocy akustycznej silnika (z karty producenta)', { jedn: 'acoustics.jedn_silnika', wyliczone: ak.jedn_silnika === 'dB' ? widmoA(ak.lw_vars, 'dB') : null, opisWyl: 'po korekcie A' })}
       <p class="podp" style="margin:6px 0 0">Karty silników podają zwykle widmo w <b>dB(A)</b> (A-weighted sound power) - wtedy program nie dodaje korekty A. Dla widma w dB korekta A jest dodawana w każdym paśmie.</p>
-      <div class="zalaczniki-male" style="margin-top:12px">${zalacznikJeden('meta.engine_wiz_path', 'obraz', 'Obraz do raportu (widmo, karta)')}${zalacznikJeden('meta.engine_pdf_path', 'pdf', 'Karta silnika PDF (na końcu raportu PDF)')}</div></div>
+      <div class="zalaczniki-male" style="margin-top:12px">${zalacznikJeden('meta.engine_wiz_path', 'obraz', 'Obraz do raportu (widmo, karta)')}${zalacznikJeden('meta.engine_pdf_path', 'pdf', 'Karta silnika PDF (w rozdziale silnika w raporcie PDF)')}</div></div>
     <div class="karta">
       <div class="naglowek-karty"><h3>${ik('odswiez')}Pochłanianie wnętrza obudowy</h3><span class="podp">poziom ciśnienia wewnątrz: LpA = LwA + Room Abs.</span></div>
       ${pWidmo('acoustics.room_abs_vars', 'Room Abs. [dB]')}
@@ -579,7 +579,7 @@ function kartaModulu(k) {
       <div class="warstwy">${warstwy.map((w, i) => wierszWarstwy(k, w, i, warstwy.length)).join('') || `<p class="podp" style="margin:4px 0">${k === 'wydech' ? 'Brak tłumika - dodaj tłumik spalin jako warstwę.' : 'Brak warstw - moduł liczony jak otwór (bez izolacyjności).'}</p>`}</div>
       <div class="akcje-modulu" style="margin-top:10px"><button class="btn btn-maly" data-dodaj-warstwe="${k}">${ik('plus')} Dodaj warstwę</button></div></div>
     <div class="karta">
-      <div class="naglowek-karty"><h3>${ik('obraz')}Załączniki do raportu</h3><span class="podp">obrazy w opisie modułu, karty PDF na końcu raportu PDF</span></div>
+      <div class="naglowek-karty"><h3>${ik('obraz')}Załączniki do raportu</h3><span class="podp">obrazy w opisie modułu, karty PDF w raporcie PDF zaraz po rozdziale</span></div>
       <div class="akcje-modulu"><button class="btn btn-maly" data-zal-modulu="${k}" data-typ="obraz">${ik('obraz')} Dodaj obraz</button>
         <button class="btn btn-maly" data-zal-modulu="${k}" data-typ="pdf">${ik('dokument')} Dodaj kartę PDF</button></div>
       ${zal.length ? `<div class="lista-zalacznikow" style="margin-top:10px">${zal.map((a, i) => `<span class="znacznik akt ${MINIATURY_BRAK.has(a.path) ? 'brak' : ''}">${ik(a.type === 'Dokument (PDF)' ? 'dokument' : 'obraz')} ${esc(nazwaPliku(a.path))}<button class="btn btn-bez btn-ikona" data-usun-zal-modulu="${k}" data-i="${i}" title="Usuń">${ik('x')}</button></span>`).join('')}</div>` : ''}`}
@@ -1033,7 +1033,7 @@ function rysujUstawienia() {
       <div class="wiersz"><span class="et">Wielkość tekstu</span>${seg('u-rozmiar', [['maly', 'Mała'], ['normalny', 'Normalna'], ['duzy', 'Duża']], pr.rozmiar)}</div></section>
     <section class="karta"><h3>${ik('word')} Raporty</h3><p class="opis">Raport PDF / DOCX z obliczeń</p>
       <div class="wiersz"><span class="et">Otwórz raport po zapisaniu</span>${przelacznik('u-otworz', pr.otworz_raport)}</div>
-      <div class="wiersz"><span class="et">Karty producentów w raporcie PDF<small>pliki PDF silnika, chłodnicy i modułów dołączone na końcu raportu</small></span>${przelacznik('u-pdf-zal', pr.pdf_zalaczniki)}</div>
+      <div class="wiersz"><span class="et">Karty producentów w raporcie PDF<small>pliki PDF silnika, chłodnicy, modułów i wydechu wstawione po ich rozdziałach</small></span>${przelacznik('u-pdf-zal', pr.pdf_zalaczniki)}</div>
       <div class="wiersz"><span class="et">${KONTO.szablon ? 'Własny szablon (zastępuje papier firmowy)' : 'Szablon z nagłówkiem i stopką'}<small>${pr.szablon ? esc(pr.szablon) : KONTO.szablon ? `brak - raporty na papierze firmowym ${esc(KONTO.firma)} (z konta)` : 'brak - stopka programu (numer projektu, numer strony)'}</small></span>
         <span class="wartosci">${pr.szablon ? '<button class="btn btn-maly btn-bez" id="u-szablon-usun">Usuń</button>' : ''}<button class="btn btn-maly" id="u-szablon">${ik('folder')} Wybierz…</button></span></div>
       <p class="podp" style="margin:8px 0 0">Szablon to zwykły dokument Word (.docx) z Twoim nagłówkiem i stopką. Program bierze z niego nagłówek, stopkę, marginesy i rozmiar strony - treść szablonu pomija. PDF zapisuje Microsoft Word, więc stopka jest taka sama w PDF i DOCX. W nagłówku i stopce szablonu możesz wpisać pola, które program uzupełni: <b>{PROJEKT}</b> <b>{KLIENT}</b> <b>{AGREGAT}</b> <b>{SILNIK}</b> <b>{AUTOR}</b> <b>{DATA}</b> <b>{TYTUL}</b>.</p></section>

@@ -4,11 +4,17 @@ import sys
 # ==========================================
 # KONFIGURACJA I METADANE
 # ==========================================
-VERSION = "2.0.6"
+VERSION = "2.0.7"
 DB_VERSION = "0"  # wersja bazy, gdy lokalny plik jej nie zawiera (baza z panelu diamel.pl ma numer wersji 1, 2, 3...)
-BUILD_DATE = "2026-11-06 17:30"
+BUILD_DATE = "2026-11-06 18:30"
 
 CHANGELOG = """
+v2.0.7 (2026-11-06)
+- Raport PDF: karty producentów (PDF) w swoich rozdziałach - karta silnika po rozdziale silnika, chłodnicy po chłodnicy,
+  modułów po budowie obudowy, wydechu po rozdziale wydechu (wcześniej wszystkie na końcu raportu).
+- Raport: wyraźny wynik końcowy na pierwszej stronie (ramka: spełnia / nie spełnia, punkt krytyczny, zapas) i ramka
+  z wynikiem przy każdym punkcie pomiarowym; kafelki punktów w kolorze wyniku.
+
 v2.0.6 (2026-11-06)
 - Raport: kafelek punktu pokazuje wynik decydujący (gorszy z dwóch: po stronie komina / średnio) - zgodny z zapasem;
   gdy decyduje strona komina, pod spodem średnia wokół obudowy.

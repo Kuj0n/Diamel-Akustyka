@@ -15,7 +15,7 @@ from datetime import datetime
 
 from docx import Document
 from docx.enum.table import WD_TABLE_ALIGNMENT, WD_CELL_VERTICAL_ALIGNMENT
-from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT, WD_BREAK
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Inches, Pt, RGBColor, Emu
@@ -43,8 +43,13 @@ TEKSTY = {
         "moduly": {"sciana": "Ściany", "podloga": "Podłoga / rama", "sufit": "Sufit / dach", "drzwi": "Drzwi", "czerpnia": "Czerpnia powietrza (wlot)",
                    "wyrzut": "Wyrzut powietrza (wylot)", "wydech": "Wydech silnika (komin)"},
         "k_wymagane": "wymagane ≤ {l} dB(A) · {d} m", "k_zapas": "zapas {z} dB", "k_brak": "przekroczenie {z} dB", "k_komin": "po stronie komina (średnio {s} dB(A))",
+        "karta": "Karta producenta (PDF): {n}", "karta_dalej": " - na kolejnych stronach",
+        "w_tytul": "WYNIK OBLICZEŃ - PUNKT {n}", "w_spelnia": "SPEŁNIA", "w_nie": "NIE SPEŁNIA",
+        "w_opis_ok": "wymagane ≤ {l} dB(A) w odległości {d} m · zapas {z} dB", "w_opis_zle": "wymagane ≤ {l} dB(A) w odległości {d} m · przekroczenie o {z} dB",
+        "w_komin": "decyduje poziom po stronie komina (średnio wokół obudowy {s} dB(A))", "w_srednia": "poziom średni wokół obudowy (ISO 3744); po stronie komina {k} dB(A)",
+        "w_dom": "największy udział: {m} ({p} %)",
         "ok": "Obudowa spełnia wymagania akustyczne we wszystkich punktach", "zle": "Obudowa nie spełnia wymagań akustycznych",
-        "zle_pkt": "przekroczenie w punktach: {p}", "dominuje": "Największy udział w hałasie: {m} ({p} %).",
+        "zle_pkt": "przekroczenie w punktach: {p}", "wk_tytul": "WYNIK KOŃCOWY ANALIZY", "wk_naj": "Punkt krytyczny {p}: {w} dB(A) (wymagane ≤ {l} dB(A))", "dominuje": "Największy udział w hałasie: {m} ({p} %).",
         "rewizje": "Historia zmian dokumentu", "rev_h": ["Rew.", "Opis zmiany", "Wykonał", "Sprawdził", "Data"],
         "s1": "Cel analizy i dane wejściowe", "s2": "Źródło hałasu - widmo silnika", "s3": "Pochłanianie i poziom ciśnienia wewnątrz obudowy",
         "s4": "Budowa obudowy - moduły i warstwy", "s5_chl": "Chłodnica", "s5_wyd": "Wydech silnika", "s6": "Wyniki w punktach pomiarowych", "s7": "Metoda obliczeń i założenia",
@@ -104,8 +109,13 @@ TEKSTY = {
         "moduly": {"sciana": "Walls", "podloga": "Floor / base frame", "sufit": "Roof", "drzwi": "Doors", "czerpnia": "Air intake (louvre)",
                    "wyrzut": "Air discharge (louvre)", "wydech": "Engine exhaust (stack)"},
         "k_wymagane": "required ≤ {l} dB(A) · {d} m", "k_zapas": "margin {z} dB", "k_brak": "exceeded by {z} dB", "k_komin": "stack side (average {s} dB(A))",
+        "karta": "Manufacturer's data sheet (PDF): {n}", "karta_dalej": " - on the following pages",
+        "w_tytul": "CALCULATION RESULT - POINT {n}", "w_spelnia": "COMPLIANT", "w_nie": "NOT COMPLIANT",
+        "w_opis_ok": "required ≤ {l} dB(A) at {d} m · margin {z} dB", "w_opis_zle": "required ≤ {l} dB(A) at {d} m · exceeded by {z} dB",
+        "w_komin": "the level on the stack side governs (average around the enclosure {s} dB(A))", "w_srednia": "average level around the enclosure (ISO 3744); stack side {k} dB(A)",
+        "w_dom": "largest contribution: {m} ({p} %)",
         "ok": "The enclosure meets the acoustic requirements at all points", "zle": "The enclosure does not meet the acoustic requirements",
-        "zle_pkt": "exceeded at: {p}", "dominuje": "Largest contribution to the noise: {m} ({p} %).",
+        "zle_pkt": "exceeded at: {p}", "wk_tytul": "FINAL RESULT OF THE ANALYSIS", "wk_naj": "Critical point {p}: {w} dB(A) (required ≤ {l} dB(A))", "dominuje": "Largest contribution to the noise: {m} ({p} %).",
         "rewizje": "Document revision history", "rev_h": ["Rev.", "Description of change", "Drawn", "Checked", "Date"],
         "s1": "Scope and input data", "s2": "Noise source - engine spectrum", "s3": "Absorption and sound pressure inside the enclosure",
         "s4": "Enclosure structure - modules and layers", "s5_chl": "Radiator", "s5_wyd": "Engine exhaust", "s6": "Results at the measurement points", "s7": "Calculation method and assumptions",
@@ -444,7 +454,8 @@ class Raport:
         tab = self.tabela(1, len(punkty))
         _marginesy_komorek(tab, 90, 90, 130, 130)
         for k, pt in zip(tab.rows[0].cells, punkty):
-            _ramki_komorki(k, top=(6, "9CA3AF"), bottom=(6, "9CA3AF"), left=(6, "9CA3AF"), right=(6, "9CA3AF"))
+            r_kol = "047857" if pt["zgodny"] else "B91C1C"
+            _ramki_komorki(k, top=(12, r_kol), bottom=(12, r_kol), left=(12, r_kol), right=(12, r_kol))
             self.komorka(k, (pt["name"] or f"{n.g(pt['d'])} m").upper(), 6.5, kolor=SZARY)
             p = k.add_paragraph()
             _odstepy(p, 2, 1)
@@ -463,13 +474,28 @@ class Raport:
             _styl_runu(p.add_run((t["k_zapas"] if pt["zgodny"] else t["k_brak"]).format(z=n(abs(pt["zapas"]), 1))), 7.5, kolor=ZIELONY if pt["zgodny"] else CZERWONY)
         self.szerokosci(tab, [1] * len(punkty))
 
+        # wynik końcowy - wyraźna ramka: werdykt, najgorszy punkt (najmniejszy zapas), wymaganie
         zle = [pt["name"] or f"{n.g(pt['d'])} m" for pt in w["punkty"] if not pt["zgodny"]]
-        p = self.akapit(przed=10, po=2)
-        _ramka_akapitu(p, "left", 24, "047857" if not zle else "B91C1C", 8)
-        _styl_runu(p.add_run("✓  " if not zle else "✗  "), 11, True, ZIELONY if not zle else CZERWONY, czcionka="Segoe UI Symbol")
-        _styl_runu(p.add_run(t["ok"] if not zle else t["zle"]), 11, True)
+        ok, hex_ = not zle, ("047857" if not zle else "B91C1C")
+        kolor = ZIELONY if ok else CZERWONY
+        naj = min(w["punkty"], key=lambda x: x["zapas"])
+        p = self.akapit(przed=12, po=4)
+        p.paragraph_format.keep_together = True
+        for bok in ("top", "bottom", "right"):
+            _ramka_akapitu(p, bok, 8, hex_, 6)
+        _ramka_akapitu(p, "left", 48, hex_, 10)
+        _tlo_akapitu(p, "ECFDF5" if ok else "FEF2F2")
+        _styl_runu(p.add_run(t["wk_tytul"]), 8.5, True, SZARY)
+        p.add_run().add_break()
+        _styl_runu(p.add_run("✓  " if ok else "✗  "), 18, True, kolor, czcionka="Segoe UI Symbol")
+        _styl_runu(p.add_run(t["ok"] if ok else t["zle"]), 15, True, kolor)
+        p.add_run().add_break()
+        _styl_runu(p.add_run(t["wk_naj"].format(p=naj["name"] or f"{n.g(naj['d'])} m", w=n(naj.get("decyduje", naj["wynik"]), 1),
+                                                l=n.g(naj["limit"]))), 10.5, True, TEKST)
+        _styl_runu(p.add_run("  ·  " + (t["k_zapas"] if naj["zgodny"] else t["k_brak"]).format(z=n(abs(naj["zapas"]), 1))), 10.5, True, kolor)
         if zle:
-            _styl_runu(p.add_run(" - " + t["zle_pkt"].format(p=", ".join(zle))), 9.5, kolor=CZERWONY)
+            p.add_run().add_break()
+            _styl_runu(p.add_run(t["zle_pkt"].format(p=", ".join(zle))), 9.5, True, CZERWONY)
         pt0 = w["punkty"][0]
         if pt0["dominujacy"]:
             p = self.akapit(t["dominuje"].format(m=self.nazwa_modulu(pt0["dominujacy"]).lower() if not self.en else self.nazwa_modulu(pt0["dominujacy"]),
@@ -537,6 +563,54 @@ class Raport:
         dane = [[nazwa] + [n(x, 1) for x in wart] + ([n(s, 1) if s is not None else ""] if suma else []) for nazwa, wart, s in wiersze]
         return self.tabela_prosta(nag, dane, [2.6] + [1] * 8 + ([1.15] if suma else []))
 
+    def karty(self, klucz):
+        """
+        Karty producentów (PDF) w miejscu rozdziału: w raporcie PDF znacznik + nowa strona - po zapisie z Worda wstaw_karty()
+        wkleja strony karty zaraz po stronie ze znacznikiem; w DOCX tylko nazwa karty.
+        """
+        lista = (self.obrazy.get("karty") or {}).get(klucz) or []
+        w_pdf = bool(self.obrazy.get("karty_w_pdf"))
+        for sciezka in lista:
+            p = self.akapit(przed=4, po=2)
+            _styl_runu(p.add_run("▤  "), 9, True, AKCENT, czcionka="Segoe UI Symbol")
+            _styl_runu(p.add_run(self.t["karta"].format(n=os.path.basename(sciezka)) + (self.t["karta_dalej"] if w_pdf else "")), 9, kolor=SZARY)
+        if lista and w_pdf:
+            p = self.akapit(po=0)
+            _styl_runu(p.add_run(f"[[KARTA:{klucz}]]"), 1, kolor=RGBColor(0xFF, 0xFF, 0xFF))
+            p.add_run().add_break(WD_BREAK.PAGE)
+
+    def wynik_punktu(self, pt, nazwa):
+        """Wyraźna ramka z wynikiem w punkcie: wynik decydujący, SPEŁNIA / NIE SPEŁNIA, wymaganie i zapas."""
+        t, n = self.t, self.n
+        ok, kolor, hex_ = pt["zgodny"], (ZIELONY if pt["zgodny"] else CZERWONY), ("047857" if pt["zgodny"] else "B91C1C")
+        tlo = "ECFDF5" if ok else "FEF2F2"
+        p = self.akapit(przed=10, po=10)
+        p.paragraph_format.keep_together = True
+        for bok in ("top", "bottom", "right"):
+            _ramka_akapitu(p, bok, 6, hex_, 6)
+        _ramka_akapitu(p, "left", 36, hex_, 8)
+        _tlo_akapitu(p, tlo)
+        _styl_runu(p.add_run(t["w_tytul"].format(n=nazwa.upper())), 8, True, SZARY)
+        p.add_run().add_break()
+        decyduje = pt.get("decyduje", pt["wynik"])
+        _styl_runu(p.add_run(f"{n(decyduje, 1)} dB(A)"), 20, True, TEKST)
+        _styl_runu(p.add_run(f"   {'✓' if ok else '✗'} "), 16, True, kolor, czcionka="Segoe UI Symbol")
+        _styl_runu(p.add_run(t["w_spelnia"] if ok else t["w_nie"]), 14, True, kolor)
+        p.add_run().add_break()
+        _styl_runu(p.add_run((t["w_opis_ok"] if ok else t["w_opis_zle"]).format(l=n.g(pt["limit"]), d=n.g(pt["d"]), z=n(abs(pt["zapas"]), 1))), 9.5, True, kolor)
+        k = pt.get("komin")
+        dom = (k or {}).get("dominujacy") if k and k["wynik"] > pt["wynik"] else pt["dominujacy"]
+        opisy = []
+        if k:
+            opisy.append(t["w_komin"].format(s=n(pt["wynik"], 1)) if k["wynik"] > pt["wynik"] else t["w_srednia"].format(k=n(k["wynik"], 1)))
+        if dom and dom in pt["moduly"]:
+            proc = 10 ** ((k["wydech"] - k["wynik"]) / 10) * 100 if (k and k["wynik"] > pt["wynik"] and dom == "wydech") else (
+                10 ** ((pt["moduly"][dom]["udzial"] - k["wynik"]) / 10) * 100 if (k and k["wynik"] > pt["wynik"]) else pt["moduly"][dom]["procent"])
+            opisy.append(t["w_dom"].format(m=self.nazwa_modulu(dom).lower() if not self.en else self.nazwa_modulu(dom), p=n(proc, 0)))
+        if opisy:
+            p.add_run().add_break()
+            _styl_runu(p.add_run(" · ".join(opisy)), 8.5, kolor=SZARY)
+
     def ocena(self, ok, tekst):
         """Wiersz z oceną: ✓ zielony, ✗ czerwony, i niebieski (informacyjnie)."""
         symbol, kolor = {True: ("✓", ZIELONY), False: ("✗", CZERWONY), "info": ("i", NIEBIESKI), None: ("–", SZARY)}[ok]
@@ -592,6 +666,7 @@ class Raport:
         self.rysunek(rysuj_widmo(w, t, n), t["rys_widmo"].replace("{p}", w["punkty"][0]["name"] or f"{n.g(w['punkty'][0]['d'])} m"))
         if self.obrazy.get("engine"):
             self.obraz(self.obrazy["engine"])
+        self.karty("engine")
 
     def wnetrze(self):
         t, w, n = self.t, self.w, self.n
@@ -621,11 +696,12 @@ class Raport:
                 p.paragraph_format.left_indent = Cm(0.4)
                 _styl_runu(p.add_run(f"•  {self.nazwa_warstwy(wa)}"), 9, True)
                 _styl_runu(p.add_run(f" - {tekst}"), 9, kolor=SZARY)
-            for sciezka in zalaczniki.get(k, []):
+            for sciezka in (zalaczniki.get(k, []) if k != "wydech" else []):  # wydech - w swoim rozdziale
                 self.obraz(sciezka)
         self.podtytul(t["izol_tab"])
         self.tabela_pasm([(self.nazwa_modulu(k), m["r"], None) for k, m in w["moduly"].items()], t["modul"], suma=False)
         self.akapit(t["s_calk"].format(s=n(w["s_calkowita"])), 9, kolor=SZARY, przed=4)
+        self.karty("moduly")
 
     def chlodnica(self):
         t, w, n, s = self.t, self.w, self.n, self.stan
@@ -640,6 +716,7 @@ class Raport:
             self.tabela_pasm(wiersze)
             if self.obrazy.get("radiator"):
                 self.obraz(self.obrazy["radiator"])
+            self.karty("radiator")
 
     def wydech(self):
         t, w, n, s = self.t, self.w, self.n, self.stan
@@ -667,6 +744,9 @@ class Raport:
             self.tabela_pasm(wiersze)
             if w["wydech_lpa_1m_suma"]:
                 self.ocena("info", t["wyd_1m"].format(v=n(w["wydech_lpa_1m_suma"], 1)))
+            for sciezka in (self.obrazy.get("moduly") or {}).get("wydech", []):
+                self.obraz(sciezka)
+            self.karty("wydech")
 
     def wyniki(self):
         t, w, n = self.t, self.w, self.n
@@ -687,7 +767,7 @@ class Raport:
                 self.akapit(t["komin"].format(h=n(k["wysokosc"], 1), r=n(k["r"], 1), wy=n(k["wydech"], 1), wk=n(k["wynik"], 1), ws=n(pt["wynik"], 1)), 9, przed=4, po=4)
                 if k["wynik"] > pt["wynik"]:
                     dom = self.nazwa_modulu(k["dominujacy"])
-            self.ocena(pt["zgodny"], (t["pkt_ok"] if pt["zgodny"] else t["pkt_zle"]).format(n=nazwa, w=n(pt.get("decyduje", pt["wynik"]), 1), l=n.g(pt["limit"]), z=n(abs(pt["zapas"]), 1), m=dom))
+            self.wynik_punktu(pt, nazwa)
 
     def metoda(self):
         t = self.t
@@ -851,6 +931,45 @@ def zapisz_pdf(docx, pdf):
             word.Quit()
         pythoncom.CoUninitialize()
     return pdf
+
+
+def wstaw_karty(pdf, karty):
+    """
+    Karty producentów (PDF) w swoich rozdziałach: strony karty wstawiane zaraz po stronie ze znacznikiem [[KARTA:klucz]]
+    (raport_docx.karty). Karta bez znacznika - na końcu. Zwraca listę pominiętych (nieczytelnych) plików.
+    """
+    from pypdf import PdfReader, PdfWriter
+    raport = PdfReader(pdf)
+    gdzie = {}
+    for i, strona in enumerate(raport.pages):
+        try:
+            tekst = strona.extract_text() or ""
+        except Exception:
+            tekst = ""
+        for klucz in karty:
+            if f"[[KARTA:{klucz}]]" in tekst.replace(" ", "").replace("\n", "") and klucz not in gdzie:
+                gdzie[klucz] = i
+    po_stronie, koniec, pominiete = {}, [], []
+    for klucz, lista in karty.items():
+        for z in lista:
+            try:
+                strony = list(PdfReader(z).pages)
+            except Exception:
+                pominiete.append(os.path.basename(z))
+                continue
+            (po_stronie.setdefault(gdzie[klucz], []) if klucz in gdzie else koniec).extend(strony)
+    pisarz = PdfWriter()
+    for i, strona in enumerate(raport.pages):
+        pisarz.add_page(strona)
+        for s in po_stronie.get(i, []):
+            pisarz.add_page(s)
+    for s in koniec:
+        pisarz.add_page(s)
+    tymczasowy = pdf + ".tmp"
+    with open(tymczasowy, "wb") as f:
+        pisarz.write(f)
+    os.replace(tymczasowy, pdf)
+    return pominiete
 
 
 def dolacz_pdf(pdf, zalaczniki):
