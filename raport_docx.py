@@ -492,10 +492,7 @@ class Raport:
             _styl_runu(tab.cell(r, 4).paragraphs[0].runs[0], 8.5, True, kol)
         for i, tekst in enumerate(przypisy):
             self.akapit(("¹ ", "² ", "³ ")[min(i, 2)] + tekst, 7.5, kolor=SZARY, przed=2 if i == 0 else 0, po=0)
-        pt0 = w["punkty"][0]
-        if pt0["dominujacy"]:
-            p = self.akapit(t["dominuje"].format(m=self.nazwa_modulu(pt0["dominujacy"]).lower() if not self.en else self.nazwa_modulu(pt0["dominujacy"]),
-                                                 p=n(pt0["moduly"][pt0["dominujacy"]]["procent"], 0)), 8.5, kolor=SZARY, przed=4, po=10)
+        self.akapit(po=6)
 
     def rewizje(self):
         rew = self.stan.get("revisions") or []

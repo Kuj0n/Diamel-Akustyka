@@ -4,11 +4,14 @@ import sys
 # ==========================================
 # KONFIGURACJA I METADANE
 # ==========================================
-VERSION = "2.0.8"
+VERSION = "2.0.9"
 DB_VERSION = "0"  # wersja bazy, gdy lokalny plik jej nie zawiera (baza z panelu diamel.pl ma numer wersji 1, 2, 3...)
-BUILD_DATE = "2026-11-06 19:00"
+BUILD_DATE = "2026-11-06 19:30"
 
 CHANGELOG = """
+v2.0.9 (2026-11-06)
+- Raport, pierwsza strona: bez linii o największym udziale w hałasie (jest w wynikach przy każdym punkcie).
+
 v2.0.8 (2026-11-06)
 - Raport, pierwsza strona: jedno podsumowanie wyników zamiast kafelków i powtórzonej ramki - werdykt w ramce i tabela
   punktów (odległość, wymagany, obliczony, zapas, ocena); przypis, gdy decyduje strona komina.
