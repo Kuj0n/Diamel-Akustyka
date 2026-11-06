@@ -11,6 +11,8 @@ BUILD_DATE = "2026-11-06 19:30"
 CHANGELOG = """
 v2.0.9 (2026-11-06)
 - Raport, pierwsza strona: bez linii o największym udziale w hałasie (jest w wynikach przy każdym punkcie).
+- Raport: rozdział nie zaczyna się już kilkoma linijkami na dole strony - nagłówek, opis i pierwsza tabela przechodzą
+  razem na następną stronę; warstwy modułu razem z jego nagłówkiem; Metoda obliczeń od nowej strony.
 
 v2.0.8 (2026-11-06)
 - Raport, pierwsza strona: jedno podsumowanie wyników zamiast kafelków i powtórzonej ramki - werdykt w ramce i tabela

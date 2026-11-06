@@ -612,7 +612,9 @@ class Raport:
         _styl_runu(p.add_run(tekst), 9.5, ok is False, kolor if ok is False else TEKST)
 
     def opis(self, tekst, po=6):
-        self.akapit(tekst, 9, przed=2, po=po)
+        p = self.akapit(tekst, 9, przed=2, po=po)
+        p.paragraph_format.keep_with_next = True  # opis zostaje na stronie razem z tabelą / rysunkiem pod nim
+        return p
 
     def rysunek(self, sciezka, opis, szerokosc=None):
         self.nr_rys += 1
@@ -680,19 +682,20 @@ class Raport:
             lista = warstwy.get(k) or []
             if not lista:
                 self.akapit(f"•  {t['warstwy_brak']}", 9, kolor=SZARY, po=2).paragraph_format.left_indent = Cm(0.4)
-            for wa in lista:
+            for nr_w, wa in enumerate(lista):
                 dane = t["warstwa_rw"].format(rw=n.g(obliczenia.liczba(wa.get("rw"), 0)), ctr=n.g(obliczenia.liczba(wa.get("ctr"), 0))) if wa.get("type") == "Rw / Ctr" else t["warstwa_widmo"]
                 d = obliczenia.liczba(wa.get("d"), 0)
                 tekst = " · ".join(x for x in (self.opis_warstwy(wa), dane, t["grubosc"].format(d=n.g(d)) if d else "") if x)
                 p = self.akapit(po=1)
                 p.paragraph_format.left_indent = Cm(0.4)
+                p.paragraph_format.keep_with_next = nr_w < len(lista) - 1  # warstwy modułu razem z jego nagłówkiem
                 _styl_runu(p.add_run(f"•  {self.nazwa_warstwy(wa)}"), 9, True)
                 _styl_runu(p.add_run(f" - {tekst}"), 9, kolor=SZARY)
             for sciezka in (zalaczniki.get(k, []) if k != "wydech" else []):  # wydech - w swoim rozdziale
                 self.obraz(sciezka)
         self.podtytul(t["izol_tab"])
+        self.akapit(t["s_calk"].format(s=n(w["s_calkowita"])), 9, kolor=SZARY, po=4).paragraph_format.keep_with_next = True
         self.tabela_pasm([(self.nazwa_modulu(k), m["r"], None) for k, m in w["moduly"].items()], t["modul"], suma=False)
-        self.akapit(t["s_calk"].format(s=n(w["s_calkowita"])), 9, kolor=SZARY, przed=4)
         self.karty("moduly")
 
     def chlodnica(self):
@@ -721,7 +724,7 @@ class Raport:
                                           h=t["wysokosc"].format(h=n.g(wys)) if wys > 0 else ""))
             if geo:
                 self.akapit(t["wyd_geo"].format(nd=n.g(obliczenia.liczba(md.get("nad_dachem"), 0)), os=n.g(obliczenia.liczba(md.get("od_sciany"), 0)),
-                                                wp=n.g(obliczenia.liczba(md.get("wys_punktu"), obliczenia.WYS_PUNKTU))), 9, kolor=SZARY, po=4)
+                                                wp=n.g(obliczenia.liczba(md.get("wys_punktu"), obliczenia.WYS_PUNKTU))), 9, kolor=SZARY, po=4).paragraph_format.keep_with_next = True
             j = "dB" if dB else "dB(A)"
             if w["wydech_lp1m"]:
                 wiersze = [(t["wyd_lp"].format(j=j), w["wydech_wpisane"], None), (t["wyd_plus"], [obliczenia.LP_NA_LW] * 8, None),
@@ -745,7 +748,7 @@ class Raport:
         for i, pt in enumerate(w["punkty"]):
             nazwa = pt["name"] or f"{n.g(pt['d'])} m"
             self.podtytul(t["pkt_tytul"].format(n=nazwa, d=n.g(pt["d"])))
-            self.akapit(f"{t['s_pom']}: {n(pt['s_pom'])} m²  ·  {t['korekta_odl']}: {n(pt['korekta_odl'])} dB", 8.5, kolor=SZARY, po=4)
+            self.akapit(f"{t['s_pom']}: {n(pt['s_pom'])} m²  ·  {t['korekta_odl']}: {n(pt['korekta_odl'])} dB", 8.5, kolor=SZARY, po=4).paragraph_format.keep_with_next = True
             wiersze = [[self.nazwa_modulu(k), n(w["moduly"][k]["s"]) if k != "wydech" else "—", n(m["lp_pow"], 1) if k != "wydech" else "—",
                         n(m["udzial"], 1), n(m["procent"], 1)] for k, m in sorted(pt["moduly"].items(), key=lambda x: -x[1]["udzial"])]
             wiersze.append([t["wynik_pkt"], n(w["s_calkowita"]), n(pt["lp_pow"], 1), n(pt["wynik"], 1), "100,0" if not self.en else "100.0"])
@@ -792,7 +795,7 @@ class Raport:
             nr += 1
         self.sekcja(nr, t["s6"], nowa_strona=True)
         self.wyniki()
-        self.sekcja(nr + 1, t["s7"])
+        self.sekcja(nr + 1, t["s7"], nowa_strona=True)
         self.metoda()
         return self.doc
 
