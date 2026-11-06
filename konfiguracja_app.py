@@ -4,11 +4,16 @@ import sys
 # ==========================================
 # KONFIGURACJA I METADANE
 # ==========================================
-VERSION = "2.0.3"
+VERSION = "2.0.4"
 DB_VERSION = "0"  # wersja bazy, gdy lokalny plik jej nie zawiera (baza z panelu diamel.pl ma numer wersji 1, 2, 3...)
-BUILD_DATE = "2026-11-06 15:00"
+BUILD_DATE = "2026-11-06 16:00"
 
 CHANGELOG = """
+v2.0.4 (2026-11-06)
+- Wydech: na zakładce i przy module udział po stronie komina (wcześniej pokazywał 0% ze średniej wokół obudowy).
+- Kierunek wylotu: krótsze opisy przycisków (Poziomo / W górę) - nie są już ucinane.
+- Test aktualizacji bez klikania instalatora.
+
 v2.0.3 (2026-11-06)
 - Aktualizacja bez klikania instalatora: program pobiera nową wersję, instaluje ją w tle i uruchamia się ponownie sam
   (działa przy aktualizacjach z tej wersji na kolejne).

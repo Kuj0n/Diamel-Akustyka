@@ -453,6 +453,8 @@ function opisZakladki(z) {
   if (INFO.moduly.includes(z)) {
     if (!P.modules_active[z]) return 'wył.';
     const u = W?.ok ? W.punkty[0]?.moduly[z] : null;
+    const k = z === 'wydech' && W?.ok ? W.punkty[0]?.komin : null;
+    if (k) return `${lp(udzialKomin(k), 0)}% (komin)`;
     return u ? `${lp(u.procent, 0)}%` : '…';
   }
   if (z === 'chlodnica') return P.radiator.active ? 'wł.' : 'wył.';
@@ -564,11 +566,11 @@ function kartaModulu(k) {
     ${!akt ? `<p class="podp" style="margin:0">Moduł wyłączony - nie jest liczony ani opisany w raporcie.${k === 'wydech' ? ' Włącz, gdy komin wydechu wychodzi z obudowy.' : ''}</p></div>` : `
     <div class="podsumowanie-modulu"><span>Powierzchnia <b class="s-modulu">${k === 'wydech' ? '—' : s === null ? '…' : `${lp(s)} m²`}</b></span>
       <span>Izolacyjność śr. <b class="r-modulu">${W?.ok && W.moduly[k] ? `${lp(W.moduly[k].r.reduce((a, b) => a + b, 0) / 8, 1)} dB` : '…'}</b></span>
-      <span>Udział w punkcie ${esc(P.points[0]?.name || '')} <b class="u-modulu">${u ? `${lp(u.udzial, 1)} dB(A) · ${lp(u.procent, 0)}%` : '…'}</b></span></div>
+      <span>Udział w punkcie ${esc(P.points[0]?.name || '')} <b class="u-modulu">${u ? opisUdzialu(k) : '…'}</b></span></div>
     <div class="tresc-modulu">
       ${AUTO_S.includes(k) ? `<p class="podp" style="margin:0">Powierzchnia z wymiarów obudowy (zakładka Obudowa)${k === 'sciana' ? ' minus drzwi, czerpnia i wyrzut' : ''}.</p>`
         : `<div class="pola p4">${k !== 'wydech' ? `${pLiczba(`mod_dims.${k}.w`, 'Szerokość', 'm')}${pLiczba(`mod_dims.${k}.h`, 'Wysokość', 'm')}` : ''}${pLiczba(`mod_dims.${k}.qty`, k === 'wydech' ? 'Liczba kominów' : 'Ilość', 'szt.')}</div>`}
-      ${k === 'wydech' ? polaWydechu() : Z_KIERUNKIEM.includes(k) ? `<div class="pola p4"><div class="p-pole"><label class="etykieta">Kierunek wylotu</label>${pSegment(`mod_dims.${k}.kierunek`, [['Poziomy', 'Poziomy'], ['Pionowy w górę', 'Pionowo w górę']])}</div>
+      ${k === 'wydech' ? polaWydechu() : Z_KIERUNKIEM.includes(k) ? `<div class="pola p4"><div class="p-pole"><label class="etykieta">Kierunek wylotu</label>${pSegment(`mod_dims.${k}.kierunek`, [['Poziomy', 'Poziomo'], ['Pionowy w górę', 'W górę']])}</div>
         ${pLiczba(`mod_dims.${k}.wysokosc`, 'Wysokość nad punktem', 'm', { podpowiedz: '0 = na wysokości punktu' })}</div>` : ''}
     </div></div>
     <div class="karta">
@@ -594,7 +596,7 @@ function widmoWydechuA() {
 function polaWydechu() {
   const ak = P.acoustics, lp1m = ak.wielkosc_wydechu === 'Lp1m', pusty = !ak.exhaust_lw_vars.some((x) => liczbaJs(x));
   const stary = String(P.mod_dims.wydech.nad_dachem ?? '').trim() === '';
-  return `<div class="pola p4"><div class="p-pole"><label class="etykieta">Kierunek wylotu</label>${pSegment('mod_dims.wydech.kierunek', [['Poziomy', 'Poziomy'], ['Pionowy w górę', 'Pionowo w górę']])}</div>
+  return `<div class="pola p4"><div class="p-pole"><label class="etykieta">Kierunek wylotu</label>${pSegment('mod_dims.wydech.kierunek', [['Poziomy', 'Poziomo'], ['Pionowy w górę', 'W górę']])}</div>
       ${pLiczba('mod_dims.wydech.nad_dachem', 'Wylot nad dachem obudowy', 'm', { podpowiedz: 'np. 1,8' })}
       ${pLiczba('mod_dims.wydech.od_sciany', 'Wylot od najbliższej ściany', 'm', { podpowiedz: 'poziomo, np. 1,2' })}
       ${pLiczba('mod_dims.wydech.wys_punktu', 'Wysokość punktu pomiaru', 'm', { podpowiedz: '1,5' })}</div>
@@ -606,6 +608,14 @@ function polaWydechu() {
       { jedn: 'acoustics.jedn_wydechu', wyliczone: lp1m || ak.jedn_wydechu === 'dB' ? widmoWydechuA() : null, opisWyl: lp1m ? 'LwA = Lp + 11' : 'po korekcie A' })}
     <p class="podp" style="margin:4px 0 0">Pasma 63 Hz - 8 kHz. Gdy karta zaczyna się od 31,5 Hz - pomiń tę kolumnę. Kolumna „dB” → jednostka dB, kolumna „dB(A)” → dB(A).${lp1m ? ' Lp@1m przeliczane na moc: Lw = Lp + 10·lg(4π) ≈ Lp + 11 dB.' : ''}</p>
     <div class="uwaga-pola uwaga-pusty-wydech" ${pusty ? '' : 'hidden'}>${ik('uwaga')} Widmo wydechu jest puste (same zera) - wydech nie jest liczony. Wpisz widmo z karty silnika albo tłumika.</div>`;
+}
+const udzialKomin = (k) => (k.wynik ? 10 ** ((k.wydech - k.wynik) / 10) * 100 : 0);
+/** Udział modułu w pierwszym punkcie; wydech z położeniem wylotu - po stronie komina i średnio. */
+function opisUdzialu(k) {
+  const pt = W?.ok ? W.punkty[0] : null, u = pt?.moduly[k];
+  if (!u) return '—';
+  if (k === 'wydech' && pt.komin) return `${lp(pt.komin.wydech, 1)} dB(A) · ${lp(udzialKomin(pt.komin), 0)}% przy kominie (średnio ${lp(u.udzial, 1)})`;
+  return `${lp(u.udzial, 1)} dB(A) · ${lp(u.procent, 0)}%`;
 }
 function opisGeoWydechu() {
   const k = W?.ok ? W.punkty[0]?.komin : null;
@@ -795,7 +805,7 @@ async function przelicz() {
     const ust = (sel, t) => { const x = $(sel); if (x) x.textContent = t; };
     ust('.s-modulu', k === 'wydech' ? '—' : `${lp(W.powierzchnie[k])} m²`);
     ust('.r-modulu', r ? `${lp(r.reduce((a, b) => a + b, 0) / 8, 1)} dB` : '—');
-    ust('.u-modulu', u ? `${lp(u.udzial, 1)} dB(A) · ${lp(u.procent, 0)}%` : '—');
+    ust('.u-modulu', u ? opisUdzialu(k) : '—');
     const g = $('.geo-wydechu');
     if (g) g.innerHTML = opisGeoWydechu();
     const pw = $('.uwaga-pusty-wydech');
