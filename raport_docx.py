@@ -49,7 +49,8 @@ TEKSTY = {
         "w_komin": "decyduje poziom po stronie komina (średnio wokół obudowy {s} dB(A))", "w_srednia": "poziom średni wokół obudowy (ISO 3744); po stronie komina {k} dB(A)",
         "w_dom": "największy udział: {m} ({p} %)",
         "ok": "Obudowa spełnia wymagania akustyczne we wszystkich punktach", "zle": "Obudowa nie spełnia wymagań akustycznych",
-        "zle_pkt": "przekroczenie w punktach: {p}", "wk_tytul": "WYNIK KOŃCOWY ANALIZY", "wk_naj": "Punkt krytyczny {p}: {w} dB(A) (wymagane ≤ {l} dB(A))", "dominuje": "Największy udział w hałasie: {m} ({p} %).",
+        "zle_pkt": "przekroczenie w punktach: {p}", "wk_tytul": "WYNIK KOŃCOWY ANALIZY", "wk_kolumny": ["Punkt pomiarowy", "Odległość", "Wymagany [dB(A)]", "Obliczony [dB(A)]", "Zapas [dB]", "Ocena"],
+        "wk_przypis": "punkt {p}: decyduje poziom po stronie komina (wydech jako źródło punktowe); średnio wokół obudowy {s} dB(A)", "wk_naj": "Punkt krytyczny {p}: {w} dB(A) (wymagane ≤ {l} dB(A))", "dominuje": "Największy udział w hałasie: {m} ({p} %).",
         "rewizje": "Historia zmian dokumentu", "rev_h": ["Rew.", "Opis zmiany", "Wykonał", "Sprawdził", "Data"],
         "s1": "Cel analizy i dane wejściowe", "s2": "Źródło hałasu - widmo silnika", "s3": "Pochłanianie i poziom ciśnienia wewnątrz obudowy",
         "s4": "Budowa obudowy - moduły i warstwy", "s5_chl": "Chłodnica", "s5_wyd": "Wydech silnika", "s6": "Wyniki w punktach pomiarowych", "s7": "Metoda obliczeń i założenia",
@@ -115,7 +116,8 @@ TEKSTY = {
         "w_komin": "the level on the stack side governs (average around the enclosure {s} dB(A))", "w_srednia": "average level around the enclosure (ISO 3744); stack side {k} dB(A)",
         "w_dom": "largest contribution: {m} ({p} %)",
         "ok": "The enclosure meets the acoustic requirements at all points", "zle": "The enclosure does not meet the acoustic requirements",
-        "zle_pkt": "exceeded at: {p}", "wk_tytul": "FINAL RESULT OF THE ANALYSIS", "wk_naj": "Critical point {p}: {w} dB(A) (required ≤ {l} dB(A))", "dominuje": "Largest contribution to the noise: {m} ({p} %).",
+        "zle_pkt": "exceeded at: {p}", "wk_tytul": "FINAL RESULT OF THE ANALYSIS", "wk_kolumny": ["Measurement point", "Distance", "Required [dB(A)]", "Calculated [dB(A)]", "Margin [dB]", "Assessment"],
+        "wk_przypis": "point {p}: the level on the stack side governs (exhaust as a point source); average around the enclosure {s} dB(A)", "wk_naj": "Critical point {p}: {w} dB(A) (required ≤ {l} dB(A))", "dominuje": "Largest contribution to the noise: {m} ({p} %).",
         "rewizje": "Document revision history", "rev_h": ["Rev.", "Description of change", "Drawn", "Checked", "Date"],
         "s1": "Scope and input data", "s2": "Noise source - engine spectrum", "s3": "Absorption and sound pressure inside the enclosure",
         "s4": "Enclosure structure - modules and layers", "s5_chl": "Radiator", "s5_wyd": "Engine exhaust", "s6": "Results at the measurement points", "s7": "Calculation method and assumptions",
@@ -449,58 +451,51 @@ class Raport:
         self.akapit(po=6)
 
     def kafelki(self):
+        """Podsumowanie wyników na pierwszej stronie: werdykt w ramce i tabela punktów (wymagany / obliczony / zapas / ocena)."""
         t, w, n = self.t, self.w, self.n
-        punkty = w["punkty"][:4]
-        tab = self.tabela(1, len(punkty))
-        _marginesy_komorek(tab, 90, 90, 130, 130)
-        for k, pt in zip(tab.rows[0].cells, punkty):
-            r_kol = "047857" if pt["zgodny"] else "B91C1C"
-            _ramki_komorki(k, top=(12, r_kol), bottom=(12, r_kol), left=(12, r_kol), right=(12, r_kol))
-            self.komorka(k, (pt["name"] or f"{n.g(pt['d'])} m").upper(), 6.5, kolor=SZARY)
-            p = k.add_paragraph()
-            _odstepy(p, 2, 1)
-            _styl_runu(p.add_run(f"{n(pt.get('decyduje', pt['wynik']), 1)} dB(A)"), 14, True)  # wynik decydujący (gorszy: średnia / strona komina)
-            symbol, kolor = ("✓", ZIELONY) if pt["zgodny"] else ("✗", CZERWONY)
-            _styl_runu(p.add_run(f"  {symbol}"), 11, True, kolor, czcionka="Segoe UI Symbol")
-            p = k.add_paragraph()
-            _odstepy(p, 0, 0)
-            _styl_runu(p.add_run(t["k_wymagane"].format(l=n.g(pt["limit"]), d=n.g(pt["d"]))), 7.5, kolor=SZARY)
-            if pt.get("komin") and pt["komin"]["wynik"] > pt["wynik"]:
-                p = k.add_paragraph()
-                _odstepy(p, 0, 0)
-                _styl_runu(p.add_run(t["k_komin"].format(s=n(pt["wynik"], 1))), 7.5, kolor=SZARY)
-            p = k.add_paragraph()
-            _odstepy(p, 0, 0)
-            _styl_runu(p.add_run((t["k_zapas"] if pt["zgodny"] else t["k_brak"]).format(z=n(abs(pt["zapas"]), 1))), 7.5, kolor=ZIELONY if pt["zgodny"] else CZERWONY)
-        self.szerokosci(tab, [1] * len(punkty))
-
-        # wynik końcowy - wyraźna ramka: werdykt, najgorszy punkt (najmniejszy zapas), wymaganie
-        zle = [pt["name"] or f"{n.g(pt['d'])} m" for pt in w["punkty"] if not pt["zgodny"]]
-        ok, hex_ = not zle, ("047857" if not zle else "B91C1C")
-        kolor = ZIELONY if ok else CZERWONY
-        naj = min(w["punkty"], key=lambda x: x["zapas"])
-        p = self.akapit(przed=12, po=4)
-        p.paragraph_format.keep_together = True
+        zle = [pt for pt in w["punkty"] if not pt["zgodny"]]
+        ok, hex_, kolor = not zle, ("047857" if not zle else "B91C1C"), (ZIELONY if not zle else CZERWONY)
+        p = self.akapit(przed=4, po=6)
+        p.paragraph_format.keep_with_next = True
         for bok in ("top", "bottom", "right"):
-            _ramka_akapitu(p, bok, 8, hex_, 6)
-        _ramka_akapitu(p, "left", 48, hex_, 10)
+            _ramka_akapitu(p, bok, 6, hex_, 5)
+        _ramka_akapitu(p, "left", 36, hex_, 8)
         _tlo_akapitu(p, "ECFDF5" if ok else "FEF2F2")
-        _styl_runu(p.add_run(t["wk_tytul"]), 8.5, True, SZARY)
+        _styl_runu(p.add_run(t["wk_tytul"]), 7.5, True, SZARY)
         p.add_run().add_break()
-        _styl_runu(p.add_run("✓  " if ok else "✗  "), 18, True, kolor, czcionka="Segoe UI Symbol")
-        _styl_runu(p.add_run(t["ok"] if ok else t["zle"]), 15, True, kolor)
-        p.add_run().add_break()
-        _styl_runu(p.add_run(t["wk_naj"].format(p=naj["name"] or f"{n.g(naj['d'])} m", w=n(naj.get("decyduje", naj["wynik"]), 1),
-                                                l=n.g(naj["limit"]))), 10.5, True, TEKST)
-        _styl_runu(p.add_run("  ·  " + (t["k_zapas"] if naj["zgodny"] else t["k_brak"]).format(z=n(abs(naj["zapas"]), 1))), 10.5, True, kolor)
+        _styl_runu(p.add_run("✓  " if ok else "✗  "), 13, True, kolor, czcionka="Segoe UI Symbol")
+        _styl_runu(p.add_run(t["ok"] if ok else t["zle"]), 13, True, kolor)
         if zle:
             p.add_run().add_break()
-            _styl_runu(p.add_run(t["zle_pkt"].format(p=", ".join(zle))), 9.5, True, CZERWONY)
+            _styl_runu(p.add_run(t["zle_pkt"].format(p=", ".join(pt["name"] or f"{n.g(pt['d'])} m" for pt in zle))), 9.5, True, CZERWONY)
+
+        przypisy = []
+        wiersze = []
+        for pt in w["punkty"]:
+            dec = pt.get("decyduje", pt["wynik"])
+            znak = ""
+            if pt.get("komin") and pt["komin"]["wynik"] > pt["wynik"]:
+                przypisy.append(t["wk_przypis"].format(p=pt["name"] or f"{n.g(pt['d'])} m", s=n(pt["wynik"], 1)))
+                znak = "¹" if len(przypisy) == 1 else "²" if len(przypisy) == 2 else "³"
+            wiersze.append([pt["name"] or f"{n.g(pt['d'])} m", f"{n.g(pt['d'])} m", f"≤ {n.g(pt['limit'])}", f"{n(dec, 1)}{znak}",
+                            ("+" if pt["zapas"] >= 0 else "−") + n(abs(pt["zapas"]), 1), ""])
+        tab = self.tabela_prosta(t["wk_kolumny"], wiersze, [2.6, 1, 1.1, 1.1, 1, 1.4])
+        for r, pt in enumerate(w["punkty"], 1):
+            k = tab.cell(r, 5)
+            akap = k.paragraphs[0]
+            for run in list(akap.runs):
+                run._r.getparent().remove(run._r)
+            kol = ZIELONY if pt["zgodny"] else CZERWONY
+            _styl_runu(akap.add_run("✓ " if pt["zgodny"] else "✗ "), 9, True, kol, czcionka="Segoe UI Symbol")
+            _styl_runu(akap.add_run(t["w_spelnia"] if pt["zgodny"] else t["w_nie"]), 8, True, kol)
+            _styl_runu(tab.cell(r, 3).paragraphs[0].runs[0], 9.5, True, TEKST)
+            _styl_runu(tab.cell(r, 4).paragraphs[0].runs[0], 8.5, True, kol)
+        for i, tekst in enumerate(przypisy):
+            self.akapit(("¹ ", "² ", "³ ")[min(i, 2)] + tekst, 7.5, kolor=SZARY, przed=2 if i == 0 else 0, po=0)
         pt0 = w["punkty"][0]
         if pt0["dominujacy"]:
             p = self.akapit(t["dominuje"].format(m=self.nazwa_modulu(pt0["dominujacy"]).lower() if not self.en else self.nazwa_modulu(pt0["dominujacy"]),
-                                                 p=n(pt0["moduly"][pt0["dominujacy"]]["procent"], 0)), 9, kolor=SZARY, po=10)
-            p.paragraph_format.left_indent = Cm(0.45)
+                                                 p=n(pt0["moduly"][pt0["dominujacy"]]["procent"], 0)), 8.5, kolor=SZARY, przed=4, po=10)
 
     def rewizje(self):
         rew = self.stan.get("revisions") or []
