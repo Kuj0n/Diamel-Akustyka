@@ -12,6 +12,9 @@ Metoda (jak w wersji 1.1.0 - wynik całkowity w punkcie bez zmian):
 - wydech (komin): własne widmo Lw wydechu minus tłumik, × liczba kominów; chłodnica na wyrzucie: własne Lw chłodnicy
   plus hałas silnika przez rdzeń chłodnicy,
 - czerpnia / wyrzut / wydech skierowane pionowo w górę: −3 dB; wylot na wysokości h nad punktem: −20·lg(√(d²+h²)/d),
+- wydech dodatkowo po stronie komina (od 2.0.2, gdy podane położenie wylotu): źródło punktowe Lp = LwA za tłumikiem −
+  10·lg(4π·r²) + kierunek, r - odległość wylotu od punktu; pozostałe moduły jak w średniej. O zgodności decyduje gorszy wynik,
+- widmo wydechu z karty tłumika (Lp@1m od wylotu): Lw = Lp + 10·lg(4π) ≈ Lp + 11 dB,
 - poziom w punkcie pomiarowym wg ISO 3744 (prostopadłościenna powierzchnia pomiarowa l+2d × w+2d × h+d, bez podłogi):
   Lp(d) = 10·lg(ΣW / S_pom).
 
@@ -31,6 +34,21 @@ OTWORY_W_SCIANIE = ("drzwi", "czerpnia", "wyrzut")   # zmniejszają powierzchni�
 Z_KIERUNKIEM = ("wydech", "czerpnia", "wyrzut")       # kierunek wylotu i wysokość nad punktem
 PIONOWO = "Pionowy w górę"
 JEDNOSTKI = ("dBA", "dB")
+LP_NA_LW = 10 * math.log10(4 * math.pi)  # ≈ 11 dB: Lw = Lp@1m + 10·lg(4π·1²) - źródło punktowe w wolnym polu (karty tłumików podają Lp@1m)
+WYS_PUNKTU = 1.5  # domyślna wysokość punktu pomiaru nad terenem [m]
+
+
+def wydech_geometria(md, h_obudowy, d):
+    """
+    Wydech jako źródło punktowe: (wysokość wylotu nad punktem, odległość wylotu od punktu po stronie komina) albo None,
+    gdy projekt nie ma położenia wylotu (projekty sprzed 2.0.2 - tylko 'wysokosc' nad punktem).
+    """
+    nad_dachem = str(md.get("nad_dachem", "")).strip()
+    if nad_dachem == "":
+        return None
+    v = max(0.0, h_obudowy + liczba(nad_dachem, 0.0) - liczba(md.get("wys_punktu"), WYS_PUNKTU))
+    poziomo = max(0.0, liczba(md.get("od_sciany"), 0.0)) + d
+    return v, max(0.5, math.sqrt(poziomo ** 2 + v ** 2))
 
 
 def liczba(v, domyslnie=None):
@@ -135,7 +153,10 @@ def oblicz(p):
     rad_aktywna = bool(rad.get("active"))
     rad_lw_a = widmo_a([liczba(x, 0.0) for x in rad.get("lw", [0.0] * 8)], rad.get("jedn", "dB"))
     rad_rdzen = [liczba(x, 0.0) for x in rad.get("att", [0.0] * 8)]
-    wydech_lw_a = widmo_a([liczba(x, 0.0) for x in ak.get("exhaust_lw_vars", [0.0] * 8)], ak.get("jedn_wydechu", "dB"))
+    lp_wydechu = ak.get("wielkosc_wydechu") == "Lp1m"  # widmo z karty tłumika: Lp@1m od wylotu -> Lw = Lp + 11 dB
+    wydech_wpisane = [liczba(x, 0.0) for x in ak.get("exhaust_lw_vars", [0.0] * 8)]
+    wydech_lw = [x + (LP_NA_LW if lp_wydechu else 0.0) for x in wydech_wpisane]
+    wydech_lw_a = widmo_a(wydech_lw, ak.get("jedn_wydechu", "dB"))
 
     s_mod = powierzchnie(p)
     aktywne, dims, warstwy = p.get("modules_active", {}), p.get("mod_dims", {}), p.get("layers", {})
@@ -159,6 +180,7 @@ def oblicz(p):
         s_pom = 2 * ((l + 2 * d) * (h + d) + (w + 2 * d) * (h + d)) + (l + 2 * d) * (w + 2 * d)
         korekta_odl = 10 * math.log10(s_pom / s_kont)
         w_emisja_pasma = [0.0] * 8
+        w_bez_wydechu = [0.0] * 8
         w_pow_suma = 0.0
         wyniki_mod = {}
         for k, m in moduly.items():
@@ -168,7 +190,8 @@ def oblicz(p):
                 md = dims.get(k, {})
                 if md.get("kierunek") == PIONOWO:
                     korekta -= 3.0
-                wys = liczba(md.get("wysokosc"), 0.0)
+                geo = wydech_geometria(md, h, d) if k == "wydech" else None
+                wys = geo[0] if geo else liczba(md.get("wysokosc"), 0.0)
                 if wys > 0:
                     r_baza = max(d, 1.0)
                     korekta -= 20 * math.log10(math.sqrt(r_baza ** 2 + wys ** 2) / r_baza)
@@ -182,6 +205,8 @@ def oblicz(p):
             w_emisja = w_mod * 10 ** (korekta / 10)
             for i in range(8):
                 w_emisja_pasma[i] += pasma[i] * 10 ** (korekta / 10)
+                if k != "wydech":
+                    w_bez_wydechu[i] += pasma[i] * 10 ** (korekta / 10)
             if k != "wydech":
                 w_pow_suma += w_mod
             wyniki_mod[k] = {
@@ -195,9 +220,26 @@ def oblicz(p):
         procent = {k: (10 ** (v["udzial"] / 10) / 10 ** (wynik / 10) * 100 if w_emisja > 0 and v["udzial"] else 0.0) for k, v in wyniki_mod.items()}
         for k in wyniki_mod:
             wyniki_mod[k]["procent"] = procent[k]
+        # Po stronie komina: wydech jako źródło punktowe w rzeczywistej odległości od wylotu (pozostałe moduły - jak wyżej, ISO 3744):
+        # Lp = Lw za tłumikiem − 10·lg(4π·r²) + kierunek. Średnia po powierzchni pomiarowej zaniża wydech przy kominie.
+        komin = None
+        geo = wydech_geometria(dims.get("wydech", {}), h, d) if "wydech" in moduly else None
+        if geo:
+            m, md = moduly["wydech"], dims.get("wydech", {})
+            kier = -3.0 if md.get("kierunek") == PIONOWO else 0.0
+            pasma_wyd = [m["qty"] * 10 ** ((wydech_lw_a[i] - m["r"][i] - 10 * math.log10(4 * math.pi * geo[1] ** 2) + kier) / 10) for i in range(8)]
+            pasma_k = [w_bez_wydechu[i] / s_pom + pasma_wyd[i] for i in range(8)]  # wydech w średniej zastąpiony źródłem punktowym
+            suma_wyd = sum(pasma_wyd)
+            komin = {"r": geo[1], "wysokosc": geo[0], "wydech": 10 * math.log10(suma_wyd) if suma_wyd > 0 else 0.0,
+                     "wynik": 10 * math.log10(sum(pasma_k)) if sum(pasma_k) > 0 else 0.0,
+                     "pasma": [10 * math.log10(x) if x > 0 else 0.0 for x in pasma_k]}
+            inne = {kk: v["udzial"] for kk, v in wyniki_mod.items() if kk != "wydech"}
+            komin["dominujacy"] = "wydech" if not inne or komin["wydech"] >= max(inne.values()) else max(inne, key=inne.get)
+        decyduje = max(wynik, komin["wynik"]) if komin else wynik
         punkty.append({
             "name": pt.get("name", ""), "d": d, "limit": limit, "s_pom": s_pom, "korekta_odl": korekta_odl,
-            "moduly": wyniki_mod, "wynik": wynik, "zapas": limit - wynik, "zgodny": wynik <= limit,
+            "moduly": wyniki_mod, "wynik": wynik, "komin": komin, "decyduje": decyduje,
+            "zapas": limit - decyduje, "zgodny": decyduje <= limit,
             "pasma": [10 * math.log10(x / s_pom) if x > 0 else 0.0 for x in w_emisja_pasma],
             "lp_pow": 10 * math.log10(w_pow_suma / s_calkowita) if s_calkowita > 0 and w_pow_suma > 0 else 0.0,
             "dominujacy": max(wyniki_mod, key=lambda k: wyniki_mod[k]["udzial"]) if wyniki_mod else "",
@@ -209,6 +251,10 @@ def oblicz(p):
         "room_abs": room_abs, "lp_a": lp_a, "lp_a_suma": suma_db(lp_a),
         "chlodnica": rad_aktywna, "rad_lw_a": rad_lw_a, "rad_lw_a_suma": suma_db(rad_lw_a), "rad_rdzen": rad_rdzen,
         "wydech_lw_a": wydech_lw_a, "wydech_lw_a_suma": suma_db(wydech_lw_a) if "wydech" in moduly else 0.0,
+        "wydech_wpisane": wydech_wpisane, "wydech_lw": wydech_lw, "wydech_lp1m": lp_wydechu,
+        "wydech_pusty": "wydech" in moduly and not any(wydech_wpisane),
+        "wydech_lw_a_po": [wydech_lw_a[i] - moduly["wydech"]["r"][i] for i in range(8)] if "wydech" in moduly else [0.0] * 8,
+        "wydech_lw_a_po_suma": suma_db([wydech_lw_a[i] - moduly["wydech"]["r"][i] for i in range(8)]) if "wydech" in moduly and any(wydech_wpisane) else 0.0,
         "powierzchnie": s_mod, "moduly": moduly, "s_calkowita": s_calkowita, "s_kont": s_kont,
         "punkty": punkty, "zgodny": all(pt["zgodny"] for pt in punkty),
     }

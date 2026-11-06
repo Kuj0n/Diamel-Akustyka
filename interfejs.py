@@ -64,8 +64,11 @@ NOWY_PROJEKT = {
                  for k in obliczenia.MODULY},
     "layers": {k: [] for k in obliczenia.MODULY},
     "mod_attachments": {k: [] for k in obliczenia.MODULY},
-    "acoustics": {"lw_vars": [95.0] * 8, "room_abs_vars": [-3.0] * 8, "exhaust_lw_vars": [0.0] * 8, "jedn_silnika": "dBA", "jedn_wydechu": "dB"},
+    "acoustics": {"lw_vars": [95.0] * 8, "room_abs_vars": [-3.0] * 8, "exhaust_lw_vars": [0.0] * 8, "jedn_silnika": "dBA", "jedn_wydechu": "dB",
+                  "wielkosc_wydechu": "Lp1m"},
 }
+# wydech (od 2.0.2): położenie wylotu -> wynik po stronie komina (źródło punktowe); pionowo w górę jak zwykle komin nad dachem
+NOWY_PROJEKT["mod_dims"]["wydech"].update({"kierunek": obliczenia.PIONOWO, "nad_dachem": 1.0, "od_sciany": 1.0, "wys_punktu": obliczenia.WYS_PUNKTU})
 
 
 def wez_krotke(v):
@@ -130,6 +133,11 @@ def uzupelnij_projekt(stan):
             p["mod_dims"][k].update(stan["mod_dims"][k])
         p["layers"][k] = [{**PUSTA_WARSTWA, **w, "spec": _widmo(w.get("spec"))} for w in (stan.get("layers") or {}).get(k, []) if isinstance(w, dict)]
         p["mod_attachments"][k] = [a for a in (stan.get("mod_attachments") or {}).get(k, []) if isinstance(a, dict) and a.get("path")]
+    # projekty sprzed 2.0.2: widmo wydechu było mocą Lw, położenia wylotu nie było (wynik jak dotąd, bez strony komina)
+    if "wielkosc_wydechu" not in (stan.get("acoustics") or {}):
+        p["acoustics"]["wielkosc_wydechu"] = "Lw"
+    if "nad_dachem" not in ((stan.get("mod_dims") or {}).get("wydech") or {}) and isinstance((stan.get("mod_dims") or {}).get("wydech"), dict):
+        p["mod_dims"]["wydech"].update({"nad_dachem": "", "kierunek": stan["mod_dims"]["wydech"].get("kierunek", "Poziomy")})
     for klucz in ("lw_vars", "room_abs_vars", "exhaust_lw_vars"):
         p["acoustics"][klucz] = _widmo(p["acoustics"].get(klucz))
     p["radiator"]["lw"], p["radiator"]["att"] = _widmo(p["radiator"].get("lw")), _widmo(p["radiator"].get("att"))

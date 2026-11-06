@@ -430,7 +430,7 @@ const SEG_JEDN = [['dBA', 'dB(A)'], ['dB', 'dB']];
 /** Widmo w 8 pasmach: wiersz pól (ścieżka sc.0 … sc.7) i opcjonalnie wiersz wyliczony (np. LwA po korekcie A). */
 function pWidmo(sc, etykieta, { jedn = null, wyliczone = null, opisWyl = 'LwA [dB(A)]' } = {}) {
   const w = wez(sc) || [];
-  return `<div class="widmo">
+  return `<div class="widmo" data-widmo="${sc}" data-jedn="${jedn || ''}">
     <div class="widmo-nag"><span class="etykieta">${etykieta}</span>${jedn ? `<span class="podp">jednostka</span>${pSegment(jedn, SEG_JEDN)}` : ''}</div>
     <div class="widmo-siatka"><span></span>${INFO.pasma.map((p) => `<span class="pasmo">${p}</span>`).join('')}<span class="pasmo">suma</span>
       <span class="et-wiersza">wpisane</span>${INFO.pasma.map((_, i) => `<input class="pole" data-sc="${sc}.${i}" value="${esc(w[i])}" inputmode="decimal">`).join('')}<span class="suma-w">${lp(sumaDb(w), 1)}</span>
@@ -564,9 +564,8 @@ function kartaModulu(k) {
     <div class="tresc-modulu">
       ${AUTO_S.includes(k) ? `<p class="podp" style="margin:0">Powierzchnia z wymiarów obudowy (zakładka Obudowa)${k === 'sciana' ? ' minus drzwi, czerpnia i wyrzut' : ''}.</p>`
         : `<div class="pola p4">${k !== 'wydech' ? `${pLiczba(`mod_dims.${k}.w`, 'Szerokość', 'm')}${pLiczba(`mod_dims.${k}.h`, 'Wysokość', 'm')}` : ''}${pLiczba(`mod_dims.${k}.qty`, k === 'wydech' ? 'Liczba kominów' : 'Ilość', 'szt.')}</div>`}
-      ${Z_KIERUNKIEM.includes(k) ? `<div class="pola p4"><div class="p-pole"><label class="etykieta">Kierunek wylotu</label>${pSegment(`mod_dims.${k}.kierunek`, [['Poziomy', 'Poziomy'], ['Pionowy w górę', 'Pionowo w górę']])}</div>
+      ${k === 'wydech' ? polaWydechu() : Z_KIERUNKIEM.includes(k) ? `<div class="pola p4"><div class="p-pole"><label class="etykieta">Kierunek wylotu</label>${pSegment(`mod_dims.${k}.kierunek`, [['Poziomy', 'Poziomy'], ['Pionowy w górę', 'Pionowo w górę']])}</div>
         ${pLiczba(`mod_dims.${k}.wysokosc`, 'Wysokość nad punktem', 'm', { podpowiedz: '0 = na wysokości punktu' })}</div>` : ''}
-      ${k === 'wydech' ? pWidmo('acoustics.exhaust_lw_vars', 'Widmo mocy akustycznej wydechu Lw (przed tłumikiem)', { jedn: 'acoustics.jedn_wydechu', wyliczone: P.acoustics.jedn_wydechu === 'dB' ? widmoA(P.acoustics.exhaust_lw_vars, 'dB') : null, opisWyl: 'po korekcie A' }) : ''}
     </div></div>
     <div class="karta">
       <div class="naglowek-karty"><h3>${ik('warstwy')}Warstwy ${k === 'wydech' ? '(tłumiki spalin)' : 'izolacyjne'}</h3><span class="podp">z bazy materiałów albo własne - sumowane energetycznie</span></div>
@@ -581,6 +580,33 @@ function kartaModulu(k) {
   </div>`;
 }
 const MINIATURY_BRAK = new Set();
+
+// Wydech: położenie wylotu (wynik po stronie komina - źródło punktowe) i widmo jako Lw albo Lp@1m z karty tłumika (+11 dB)
+const LP_NA_LW = 10 * Math.log10(4 * Math.PI);
+function widmoWydechuA() {
+  const ak = P.acoustics, dodaj = ak.wielkosc_wydechu === 'Lp1m' ? LP_NA_LW : 0;
+  return widmoA(ak.exhaust_lw_vars.map((x) => liczbaJs(x) + dodaj), ak.jedn_wydechu);
+}
+function polaWydechu() {
+  const ak = P.acoustics, lp1m = ak.wielkosc_wydechu === 'Lp1m', pusty = !ak.exhaust_lw_vars.some((x) => liczbaJs(x));
+  const stary = String(P.mod_dims.wydech.nad_dachem ?? '').trim() === '';
+  return `<div class="pola p4"><div class="p-pole"><label class="etykieta">Kierunek wylotu</label>${pSegment('mod_dims.wydech.kierunek', [['Poziomy', 'Poziomy'], ['Pionowy w górę', 'Pionowo w górę']])}</div>
+      ${pLiczba('mod_dims.wydech.nad_dachem', 'Wylot nad dachem obudowy', 'm', { podpowiedz: 'np. 1,8' })}
+      ${pLiczba('mod_dims.wydech.od_sciany', 'Wylot od najbliższej ściany', 'm', { podpowiedz: 'poziomo, np. 1,2' })}
+      ${pLiczba('mod_dims.wydech.wys_punktu', 'Wysokość punktu pomiaru', 'm', { podpowiedz: '1,5' })}</div>
+    <p class="podp" style="margin:2px 0 8px">Wylot = miejsce, gdzie spaliny wychodzą w powietrze (koniec kolana / komina). Program liczy wydech dodatkowo jako źródło punktowe
+      w punkcie po stronie komina - o zgodności decyduje gorszy z dwóch wyników.<span class="geo-wydechu">${opisGeoWydechu()}</span></p>
+    ${stary ? `<div class="uwaga-pola">${ik('info')} Projekt sprzed wersji 2.0.2 - podaj położenie wylotu, żeby policzyć poziom po stronie komina (teraz tylko średnia wokół obudowy, wysokość nad punktem ${lc(liczbaJs(P.mod_dims.wydech.wysokosc))} m).</div>` : ''}
+    <div class="widmo-nag" style="margin-top:6px"><span class="etykieta">Widmo hałasu wydechu przed tłumikiem</span>${pSegment('acoustics.wielkosc_wydechu', [['Lp1m', 'Lp@1m (karta tłumika)'], ['Lw', 'Lw (moc)']])}</div>
+    ${pWidmo('acoustics.exhaust_lw_vars', lp1m ? 'Lp w odległości 1 m od wylotu - bez tłumika (karta producenta tłumika)' : 'Moc akustyczna wydechu Lw - bez tłumika',
+      { jedn: 'acoustics.jedn_wydechu', wyliczone: lp1m || ak.jedn_wydechu === 'dB' ? widmoWydechuA() : null, opisWyl: lp1m ? 'LwA = Lp + 11' : 'po korekcie A' })}
+    <p class="podp" style="margin:4px 0 0">Pasma 63 Hz - 8 kHz. Gdy karta zaczyna się od 31,5 Hz - pomiń tę kolumnę. Kolumna „dB” → jednostka dB, kolumna „dB(A)” → dB(A).${lp1m ? ' Lp@1m przeliczane na moc: Lw = Lp + 10·lg(4π) ≈ Lp + 11 dB.' : ''}</p>
+    <div class="uwaga-pola uwaga-pusty-wydech" ${pusty ? '' : 'hidden'}>${ik('uwaga')} Widmo wydechu jest puste (same zera) - wydech nie jest liczony. Wpisz widmo z karty silnika albo tłumika.</div>`;
+}
+function opisGeoWydechu() {
+  const k = W?.ok ? W.punkty[0]?.komin : null;
+  return k ? ` Punkt ${esc(P.points[0]?.name || '')}: wylot ${lp(k.wysokosc, 1)} m nad punktem, ${lp(k.r, 1)} m od punktu → wydech <b>${lp(k.wydech, 1)} dB(A)</b>, łącznie po stronie komina <b>${lp(k.wynik, 1)} dB(A)</b>.` : '';
+}
 
 function wierszWarstwy(k, w, i, ile) {
   const sc = `layers.${k}.${i}`;
@@ -766,7 +792,22 @@ async function przelicz() {
     ust('.s-modulu', k === 'wydech' ? '—' : `${lp(W.powierzchnie[k])} m²`);
     ust('.r-modulu', r ? `${lp(r.reduce((a, b) => a + b, 0) / 8, 1)} dB` : '—');
     ust('.u-modulu', u ? `${lp(u.udzial, 1)} dB(A) · ${lp(u.procent, 0)}%` : '—');
+    const g = $('.geo-wydechu');
+    if (g) g.innerHTML = opisGeoWydechu();
+    const pw = $('.uwaga-pusty-wydech');
+    if (pw) pw.hidden = !W.wydech_pusty;
   }
+  // wiersze wyliczone pod widmami (LwA po korekcie A / Lp + 11) - na bieżąco przy wpisywaniu
+  $$('.widmo[data-widmo]').forEach((el) => {
+    const wyl = el.querySelectorAll('.wyl');
+    if (!wyl.length) return;
+    const sc = el.dataset.widmo;
+    const v = sc === 'acoustics.exhaust_lw_vars' ? widmoWydechuA() : widmoA(wez(sc) || [], el.dataset.jedn ? wez(el.dataset.jedn) : 'dBA');
+    wyl.forEach((s, i) => { s.textContent = lp(v[i], 1); });
+    const sumy = el.querySelectorAll('.suma-w');
+    if (sumy[0]) sumy[0].textContent = lp(sumaDb(wez(sc) || []), 1);
+    if (sumy[1]) sumy[1].innerHTML = `<b>${lp(sumaDb(v), 1)}</b>`;
+  });
 }
 
 function rysujWyniki() {
@@ -790,7 +831,8 @@ function rysujWyniki() {
       <div><b>${zle.length ? 'Przekroczony poziom hałasu' : 'Obudowa spełnia wymagania'}</b><span>${zle.length ? `w punktach: ${zle.map((p) => esc(p.name || `${lc(p.d)} m`)).join(', ')}` : `${W.punkty.length} ${W.punkty.length === 1 ? 'punkt pomiarowy' : 'punkty pomiarowe'} · LwA silnika ${lp(W.lw_a_suma, 1)} dB(A)`}</span></div></div>
     ${W.punkty.map((pt) => `<div class="wynik">
       <div class="gora-wyniku"><div><div class="tytul-wyniku">${ik('info')}${esc(pt.name || `${lc(pt.d)} m`)} <span class="podp">· ${lc(pt.d)} m</span></div>
-        <div class="wartosc">${lp(pt.wynik, 1)}<small>dB(A)</small></div></div>
+        <div class="wartosc">${lp(pt.decyduje, 1)}<small>dB(A)</small></div>
+        ${pt.komin ? `<div class="wartosc-opis">${pt.komin.wynik >= pt.wynik ? '<b>po stronie komina</b>' : 'po stronie komina'} ${lp(pt.komin.wynik, 1)} · ${pt.komin.wynik < pt.wynik ? '<b>średnio wokół obudowy</b>' : 'średnio wokół obudowy'} ${lp(pt.wynik, 1)}</div>` : ''}</div>
         ${pt.zgodny ? `<span class="status ok">${ik('ok')}≤ ${lc(pt.limit)} · zapas ${lp(pt.zapas, 1)} dB</span>` : `<span class="status zle">${ik('uwaga')}+${lp(-pt.zapas, 1)} dB ponad ${lc(pt.limit)}</span>`}</div>
       <div class="udzialy">${Object.entries(pt.moduly).sort((a, b) => b[1].udzial - a[1].udzial).map(([k, m], i) => `
         <div class="udzial ${i === 0 ? 'glowny' : ''}"><span>${MODULY[k]}</span><div class="pasek-u"><i style="width:${Math.max(2, m.procent)}%"></i></div><b>${lp(m.udzial, 1)}</b><span class="podp">${lp(m.procent, 0)}%</span></div>`).join('')}</div>

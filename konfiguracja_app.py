@@ -4,11 +4,19 @@ import sys
 # ==========================================
 # KONFIGURACJA I METADANE
 # ==========================================
-VERSION = "2.0.1"
+VERSION = "2.0.2"
 DB_VERSION = "0"  # wersja bazy, gdy lokalny plik jej nie zawiera (baza z panelu diamel.pl ma numer wersji 1, 2, 3...)
-BUILD_DATE = "2026-11-05 12:00"
+BUILD_DATE = "2026-11-06 14:00"
 
 CHANGELOG = """
+v2.0.2 (2026-11-06)
+- Wydech: wynik po stronie komina. Po podaniu położenia wylotu (wysokość nad dachem, odległość od ściany, wysokość
+  punktu pomiaru) wydech liczony jest także jako źródło punktowe w rzeczywistej odległości od wylotu. Przy punkcie
+  widać oba wyniki - po stronie komina i średnio wokół obudowy; o zgodności decyduje gorszy. Opis w raporcie.
+- Wydech: widmo można wpisać prosto z karty tłumika jako Lp@1m od wylotu - program przelicza je na moc (+11 dB).
+  Podpowiedź przy pasmach (pomiń 31,5 Hz; kolumna dB czy dB(A)) i ostrzeżenie, gdy widmo wydechu jest puste.
+- Raport: przeliczenie widma wydechu, tłumienie tłumika i LwA za tłumikiem w tabeli.
+
 v2.0.1 (2026-11-05)
 - Ekran obliczeń w zakładkach: Projekt, Obudowa i punkty, Silnik, osobno każdy moduł (ściany, podłoga, sufit, drzwi,
   czerpnia, wyrzut, wydech) i Chłodnica. Przy module - jego udział w hałasie; moduł, który hałasuje najbardziej, wyróżniony.

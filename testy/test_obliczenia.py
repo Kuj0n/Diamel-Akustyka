@@ -92,6 +92,38 @@ def test_izolacyjnosc_i_kierunek():
     assert w["powierzchnie"]["sciana"] == 2 * (12 * 3 + 3 * 3) - 2 - 1  # czerpnia zmniejsza ściany
 
 
+def test_wydech_komin():
+    """2.0.2: widmo z karty tłumika Lp@1m (+10·lg 4π), wydech jako źródło punktowe po stronie komina."""
+    p = projekt()
+    p["modules_active"]["wydech"] = True
+    p["mod_dims"]["wydech"] = {"qty": 1, "kierunek": "Pionowy w górę", "wysokosc": 5}
+    p["layers"]["wydech"] = [{"type": "Widmo pasmowe", "spec": [13, 23, 35, 37, 41, 40, 39, 39]}]
+    p["acoustics"]["exhaust_lw_vars"] = [110, 119, 120, 117, 112, 115, 113, 108]  # AXCES REABX, Lp@1m [dB]
+    stary = obliczenia.oblicz(p)
+    assert stary["punkty"][0]["komin"] is None and stary["punkty"][0]["decyduje"] == stary["punkty"][0]["wynik"]  # projekt sprzed 2.0.2
+    p["acoustics"]["wielkosc_wydechu"] = "Lp1m"
+    w = obliczenia.oblicz(p)
+    lw = [x + 10 * math.log10(4 * math.pi) + k for x, k in zip(p["acoustics"]["exhaust_lw_vars"], obliczenia.KOREKTA_A)]
+    assert abs(w["wydech_lw_a_suma"] - db(lw)) < 1e-9
+    po = [a - b for a, b in zip(lw, p["layers"]["wydech"][0]["spec"])]
+    assert abs(w["wydech_lw_a_po_suma"] - db(po)) < 1e-9
+    assert abs(db(po) - 10 * math.log10(4 * math.pi) - 85) < 1.0  # jak prognoza AXCES: 85 dB(A) 1 m od wylotu
+    # położenie wylotu: dach 3 m + 1,8 m, punkt 1,5 m -> 3,3 m nad punktem; 1,2 m od ściany + d 1 m
+    p["mod_dims"]["wydech"].update({"nad_dachem": "1,8", "od_sciany": 1.2, "wys_punktu": 1.5})
+    w = obliczenia.oblicz(p)
+    pt = w["punkty"][0]
+    r = math.sqrt(2.2 ** 2 + 3.3 ** 2)
+    assert abs(pt["komin"]["r"] - r) < 1e-9 and abs(pt["komin"]["wysokosc"] - 3.3) < 1e-9
+    assert abs(pt["komin"]["wydech"] - (db(po) - 10 * math.log10(4 * math.pi * r ** 2) - 3)) < 1e-9
+    reszta = [10 ** (m["udzial"] / 10) for k, m in pt["moduly"].items() if k != "wydech"]
+    assert abs(pt["komin"]["wynik"] - 10 * math.log10(sum(reszta) + 10 ** (pt["komin"]["wydech"] / 10))) < 1e-9
+    assert pt["decyduje"] == max(pt["wynik"], pt["komin"]["wynik"]) and abs(pt["zapas"] - (85 - pt["decyduje"])) < 1e-9
+    # wysokość w średniej z położenia wylotu (zamiast pola "wysokosc")
+    assert abs(pt["moduly"]["wydech"]["korekta"] - (-3 - 20 * math.log10(math.sqrt(1 + 3.3 ** 2)))) < 1e-9
+    p["acoustics"]["exhaust_lw_vars"] = [0] * 8
+    assert obliczenia.oblicz(p)["wydech_pusty"]
+
+
 def test_sabine_i_bledy():
     r = obliczenia.sabine(12, 3, 3, 0.02, 0.85, 2, 1.5)
     s = 2 * 36 + 2 * 45
@@ -129,6 +161,7 @@ if __name__ == "__main__":
     test_punkty_w_tej_samej_odleglosci()
     test_jednostki_widm()
     test_izolacyjnosc_i_kierunek()
+    test_wydech_komin()
     test_sabine_i_bledy()
     n = test_wzorzec_110()
     print(f"OK - obliczenia, udziały modułów, punkty, jednostki widm, izolacyjność, Sabine"

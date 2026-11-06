@@ -67,6 +67,10 @@ TEKSTY = {
         "chl": "Chłodnica na wyrzucie: {n}", "chl_lw": "Lw chłodnicy [{j}]", "chl_rdzen": "Tłumienie rdzenia [dB]", "chl_suma": "Moc akustyczna chłodnicy LwA",
         "wyd": "Wydech silnika: {q} szt., wylot {k}{h}", "wyd_lw": "Lw wydechu [{j}]", "wyd_suma": "Moc akustyczna wydechu LwA (1 szt.)",
         "pionowo": "pionowo w górę", "poziomo": "poziomo", "wysokosc": ", na wysokości {h} m",
+        "wyd_lp": "Lp@1m od wylotu, bez tłumika [{j}]", "wyd_plus": "Przeliczenie na moc 10·lg(4π) [dB]", "wyd_lwj": "Lw wydechu [{j}]",
+        "wyd_tl": "Tłumienie tłumika [dB]", "wyd_po": "LwA za tłumikiem [dB(A)]",
+        "wyd_geo": "Wylot {nd} m nad dachem obudowy (koniec komina / kolana), {os} m od najbliższej ściany; punkt pomiaru {wp} m nad terenem.",
+        "komin": "Po stronie komina (wydech jako źródło punktowe): wylot {h} m nad punktem, odległość {r} m - wydech {wy} dB(A), łącznie z pozostałymi modułami {wk} dB(A). Średnio wokół obudowy (ISO 3744): {ws} dB(A). O ocenie punktu decyduje wyższy poziom.",
         "pkt_tytul": "Punkt {n} - odległość {d} m", "s_pom": "Powierzchnia pomiarowa ISO 3744 (dł.+2d × szer.+2d × wys.+d, bez podłogi)",
         "korekta_odl": "Korekta odległości 10·lg(S_pom / S_obudowy)",
         "udzialy": ["Moduł", "S [m²]", "Lp przy powierzchni [dB(A)]", "Udział w punkcie [dB(A)]", "Udział [%]"],
@@ -84,6 +88,7 @@ TEKSTY = {
             "Moc akustyczna wypromieniowana przez moduł: W = S·10^((LpA − R)/10), gdzie S - powierzchnia modułu, R - izolacyjność modułu. Izolacyjność warstw jednej przegrody sumowano energetycznie (R = 10·lg Σ 10^(Ri/10)) - zachowawczo: wynik bliski najlepszej warstwie. Materiały podane jako Rw / Ctr przyjęto z wartością Rw + Ctr we wszystkich pasmach.",
             "Wydech: własne widmo mocy akustycznej wydechu pomniejszone o tłumienie tłumika, razy liczba kominów. Chłodnica na wyrzucie: hałas własny chłodnicy oraz hałas silnika przechodzący przez rdzeń chłodnicy, pomniejszone o izolacyjność wyrzutu.",
             "Wyloty skierowane pionowo w górę: −3 dB (kierunkowość). Wylot na wysokości h nad punktem pomiarowym: −20·lg(√(d² + h²)/d).",
+            "Widmo wydechu podane jako poziom ciśnienia 1 m od wylotu (karta tłumika) przeliczono na moc akustyczną: Lw = Lp@1m + 10·lg(4π) ≈ Lp@1m + 11 dB (źródło punktowe w wolnym polu). Wydech oceniono dodatkowo po stronie komina jako źródło punktowe: Lp = LwA za tłumikiem − 10·lg(4π·r²) − 3 dB (wylot pionowo w górę), gdzie r to odległość wylotu od punktu; pozostałe moduły jak wyżej. O ocenie punktu decyduje wyższy z dwóch poziomów.",
             "Poziom w punkcie pomiarowym wg ISO 3744: Lp(d) = 10·lg(ΣW / S_pom), gdzie S_pom to powierzchnia prostopadłościanu pomiarowego (dł.+2d × szer.+2d × wys.+d, bez podłogi). Udział modułu w punkcie: 10·lg(W_modułu / S_pom) - udziały wszystkich modułów sumują się energetycznie do poziomu w punkcie.",
         ],
         "zalozenia": "Założenia zachowawcze: nie odjęto 6 dB przy przenikaniu przez przegrodę (EN 12354-4: na ścianę pada ćwierć energii pola rozproszonego) - wynik ma ok. 6 dB zapasu; warstwy przegrody sumowane energetycznie (w rzeczywistości izolacyjność przegrody wielowarstwowej jest zwykle większa); podłoga liczona jako promieniująca do punktu pomiarowego. Wynik nie obejmuje hałasu tła, odbić od pobliskich budynków ani drgań przenoszonych przez fundament.",
@@ -122,6 +127,10 @@ TEKSTY = {
         "chl": "Radiator on the air discharge: {n}", "chl_lw": "Radiator Lw [{j}]", "chl_rdzen": "Core attenuation [dB]", "chl_suma": "Radiator sound power level LwA",
         "wyd": "Engine exhaust: {q} pcs., outlet {k}{h}", "wyd_lw": "Exhaust Lw [{j}]", "wyd_suma": "Exhaust sound power level LwA (1 pc.)",
         "pionowo": "vertical (upwards)", "poziomo": "horizontal", "wysokosc": ", at {h} m height",
+        "wyd_lp": "Lp@1m from the outlet, unsilenced [{j}]", "wyd_plus": "Conversion to sound power 10·lg(4π) [dB]", "wyd_lwj": "Exhaust Lw [{j}]",
+        "wyd_tl": "Silencer attenuation [dB]", "wyd_po": "LwA after the silencer [dB(A)]",
+        "wyd_geo": "Outlet {nd} m above the enclosure roof (end of the stack / elbow), {os} m from the nearest wall; measurement point {wp} m above ground.",
+        "komin": "On the stack side (exhaust as a point source): outlet {h} m above the point, distance {r} m - exhaust {wy} dB(A), together with the other modules {wk} dB(A). Average around the enclosure (ISO 3744): {ws} dB(A). The higher level governs the assessment of the point.",
         "pkt_tytul": "Point {n} - distance {d} m", "s_pom": "ISO 3744 measurement surface (L+2d × W+2d × H+d, without floor)",
         "korekta_odl": "Distance correction 10·lg(S_meas / S_enclosure)",
         "udzialy": ["Module", "S [m²]", "Lp at surface [dB(A)]", "Contribution at point [dB(A)]", "Share [%]"],
@@ -139,6 +148,7 @@ TEKSTY = {
             "Sound power radiated by a module: W = S·10^((LpA − R)/10), where S is the module area and R its sound insulation. The insulation of the layers of one partition was added energetically (R = 10·lg Σ 10^(Ri/10)) - conservatively: the result is close to the best layer. Materials given as Rw / Ctr were taken with the value Rw + Ctr in all bands.",
             "Exhaust: the exhaust sound power spectrum less the silencer attenuation, times the number of stacks. Radiator on the air discharge: radiator self-noise plus the engine noise passing through the radiator core, less the insulation of the discharge.",
             "Outlets directed vertically upwards: −3 dB (directivity). Outlet at height h above the measurement point: −20·lg(√(d² + h²)/d).",
+            "The exhaust spectrum given as sound pressure 1 m from the outlet (silencer data sheet) was converted to sound power: Lw = Lp@1m + 10·lg(4π) ≈ Lp@1m + 11 dB (point source, free field). The exhaust was additionally assessed on the stack side as a point source: Lp = LwA after the silencer − 10·lg(4π·r²) − 3 dB (vertical outlet), r being the distance from the outlet to the point; other modules as above. The higher of the two levels governs the assessment of the point.",
             "Level at the measurement point per ISO 3744: Lp(d) = 10·lg(ΣW / S_meas), where S_meas is the area of the measurement box (L+2d × W+2d × H+d, without floor). Module contribution at the point: 10·lg(W_module / S_meas) - the contributions of all modules add up energetically to the level at the point.",
         ],
         "zalozenia": "Conservative assumptions: the 6 dB transmission term (EN 12354-4: a quarter of the diffuse field energy is incident on the wall) was not subtracted - the result has a margin of about 6 dB; partition layers added energetically (in reality the insulation of a multi-layer partition is usually higher); the floor is treated as radiating to the measurement point. The result does not include background noise, reflections from nearby buildings or vibration transmitted through the foundation.",
@@ -627,13 +637,23 @@ class Raport:
         if "wydech" in w["moduly"]:
             ak, md = s.get("acoustics") or {}, (s.get("mod_dims") or {}).get("wydech", {})
             dB = ak.get("jedn_wydechu", "dB") == "dB"
-            wys = obliczenia.liczba(md.get("wysokosc"), 0)
+            geo = str(md.get("nad_dachem", "")).strip() != ""
+            wys = 0 if geo else obliczenia.liczba(md.get("wysokosc"), 0)
             self.podtytul(t["wyd"].format(q=w["moduly"]["wydech"]["qty"], k=t["pionowo"] if md.get("kierunek") == obliczenia.PIONOWO else t["poziomo"],
                                           h=t["wysokosc"].format(h=n.g(wys)) if wys > 0 else ""))
-            wiersze = [(t["wyd_lw"].format(j="dB" if dB else "dB(A)"), [obliczenia.liczba(x, 0) for x in ak.get("exhaust_lw_vars", [0] * 8)], None)]
+            if geo:
+                self.akapit(t["wyd_geo"].format(nd=n.g(obliczenia.liczba(md.get("nad_dachem"), 0)), os=n.g(obliczenia.liczba(md.get("od_sciany"), 0)),
+                                                wp=n.g(obliczenia.liczba(md.get("wys_punktu"), obliczenia.WYS_PUNKTU))), 9, kolor=SZARY, po=4)
+            j = "dB" if dB else "dB(A)"
+            if w["wydech_lp1m"]:
+                wiersze = [(t["wyd_lp"].format(j=j), w["wydech_wpisane"], None), (t["wyd_plus"], [obliczenia.LP_NA_LW] * 8, None),
+                           (t["wyd_lwj"].format(j=j), w["wydech_lw"], None)]
+            else:
+                wiersze = [(t["wyd_lw"].format(j=j), w["wydech_lw"], None)]
             if dB:
                 wiersze.append((t["korekta_a"], obliczenia.KOREKTA_A, None))
-            wiersze.append((t["lwa"], w["wydech_lw_a"], w["wydech_lw_a_suma"]))
+            wiersze += [(t["lwa"], w["wydech_lw_a"], w["wydech_lw_a_suma"]), (t["wyd_tl"], w["moduly"]["wydech"]["r"], None),
+                        (t["wyd_po"], w["wydech_lw_a_po"], w["wydech_lw_a_po_suma"])]
             self.tabela_pasm(wiersze)
 
     def wyniki(self):
@@ -650,7 +670,12 @@ class Raport:
                 self.rysunek(rysuj_udzialy(pt, t, n, self), t["rys_udzialy"].replace("{p}", nazwa).replace("{w}", n(pt["wynik"], 1)), Emu(int(self.szer * 0.9)))
             self.tabela_pasm([(t["pasma_pkt"], pt["pasma"], pt["wynik"])])
             dom = self.nazwa_modulu(pt["dominujacy"]) if pt["dominujacy"] else "—"
-            self.ocena(pt["zgodny"], (t["pkt_ok"] if pt["zgodny"] else t["pkt_zle"]).format(n=nazwa, w=n(pt["wynik"], 1), l=n.g(pt["limit"]), z=n(abs(pt["zapas"]), 1), m=dom))
+            if pt.get("komin"):
+                k = pt["komin"]
+                self.akapit(t["komin"].format(h=n(k["wysokosc"], 1), r=n(k["r"], 1), wy=n(k["wydech"], 1), wk=n(k["wynik"], 1), ws=n(pt["wynik"], 1)), 9, przed=4, po=4)
+                if k["wynik"] > pt["wynik"]:
+                    dom = self.nazwa_modulu(k["dominujacy"])
+            self.ocena(pt["zgodny"], (t["pkt_ok"] if pt["zgodny"] else t["pkt_zle"]).format(n=nazwa, w=n(pt.get("decyduje", pt["wynik"]), 1), l=n.g(pt["limit"]), z=n(abs(pt["zapas"]), 1), m=dom))
 
     def metoda(self):
         t = self.t
