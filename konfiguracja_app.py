@@ -4,11 +4,15 @@ import sys
 # ==========================================
 # KONFIGURACJA I METADANE
 # ==========================================
-VERSION = "2.0.2"
+VERSION = "2.0.3"
 DB_VERSION = "0"  # wersja bazy, gdy lokalny plik jej nie zawiera (baza z panelu diamel.pl ma numer wersji 1, 2, 3...)
-BUILD_DATE = "2026-11-06 14:00"
+BUILD_DATE = "2026-11-06 15:00"
 
 CHANGELOG = """
+v2.0.3 (2026-11-06)
+- Aktualizacja bez klikania instalatora: program pobiera nową wersję, instaluje ją w tle i uruchamia się ponownie sam
+  (działa przy aktualizacjach z tej wersji na kolejne).
+
 v2.0.2 (2026-11-06)
 - Wydech: wynik po stronie komina. Po podaniu położenia wylotu (wysokość nad dachem, odległość od ściany, wysokość
   punktu pomiaru) wydech liczony jest także jako źródło punktowe w rzeczywistej odległości od wylotu. Przy punkcie
