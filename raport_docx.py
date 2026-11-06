@@ -42,7 +42,7 @@ TEKSTY = {
         "typy": {"Agregat otwarty": "Agregat otwarty (bez obudowy)", "Obudowa dźwiękochłonna": "Obudowa dźwiękochłonna (canopy)", "Obudowa kontenerowa": "Obudowa kontenerowa"},
         "moduly": {"sciana": "Ściany", "podloga": "Podłoga / rama", "sufit": "Sufit / dach", "drzwi": "Drzwi", "czerpnia": "Czerpnia powietrza (wlot)",
                    "wyrzut": "Wyrzut powietrza (wylot)", "wydech": "Wydech silnika (komin)"},
-        "k_wymagane": "wymagane ≤ {l} dB(A) · {d} m", "k_zapas": "zapas {z} dB", "k_brak": "przekroczenie {z} dB",
+        "k_wymagane": "wymagane ≤ {l} dB(A) · {d} m", "k_zapas": "zapas {z} dB", "k_brak": "przekroczenie {z} dB", "k_komin": "po stronie komina (średnio {s} dB(A))",
         "ok": "Obudowa spełnia wymagania akustyczne we wszystkich punktach", "zle": "Obudowa nie spełnia wymagań akustycznych",
         "zle_pkt": "przekroczenie w punktach: {p}", "dominuje": "Największy udział w hałasie: {m} ({p} %).",
         "rewizje": "Historia zmian dokumentu", "rev_h": ["Rew.", "Opis zmiany", "Wykonał", "Sprawdził", "Data"],
@@ -103,7 +103,7 @@ TEKSTY = {
         "typy": {"Agregat otwarty": "Open set (unenclosed)", "Obudowa dźwiękochłonna": "Soundproof canopy", "Obudowa kontenerowa": "Containerised enclosure"},
         "moduly": {"sciana": "Walls", "podloga": "Floor / base frame", "sufit": "Roof", "drzwi": "Doors", "czerpnia": "Air intake (louvre)",
                    "wyrzut": "Air discharge (louvre)", "wydech": "Engine exhaust (stack)"},
-        "k_wymagane": "required ≤ {l} dB(A) · {d} m", "k_zapas": "margin {z} dB", "k_brak": "exceeded by {z} dB",
+        "k_wymagane": "required ≤ {l} dB(A) · {d} m", "k_zapas": "margin {z} dB", "k_brak": "exceeded by {z} dB", "k_komin": "stack side (average {s} dB(A))",
         "ok": "The enclosure meets the acoustic requirements at all points", "zle": "The enclosure does not meet the acoustic requirements",
         "zle_pkt": "exceeded at: {p}", "dominuje": "Largest contribution to the noise: {m} ({p} %).",
         "rewizje": "Document revision history", "rev_h": ["Rev.", "Description of change", "Drawn", "Checked", "Date"],
@@ -448,12 +448,16 @@ class Raport:
             self.komorka(k, (pt["name"] or f"{n.g(pt['d'])} m").upper(), 6.5, kolor=SZARY)
             p = k.add_paragraph()
             _odstepy(p, 2, 1)
-            _styl_runu(p.add_run(f"{n(pt['wynik'], 1)} dB(A)"), 14, True)
+            _styl_runu(p.add_run(f"{n(pt.get('decyduje', pt['wynik']), 1)} dB(A)"), 14, True)  # wynik decydujący (gorszy: średnia / strona komina)
             symbol, kolor = ("✓", ZIELONY) if pt["zgodny"] else ("✗", CZERWONY)
             _styl_runu(p.add_run(f"  {symbol}"), 11, True, kolor, czcionka="Segoe UI Symbol")
             p = k.add_paragraph()
             _odstepy(p, 0, 0)
             _styl_runu(p.add_run(t["k_wymagane"].format(l=n.g(pt["limit"]), d=n.g(pt["d"]))), 7.5, kolor=SZARY)
+            if pt.get("komin") and pt["komin"]["wynik"] > pt["wynik"]:
+                p = k.add_paragraph()
+                _odstepy(p, 0, 0)
+                _styl_runu(p.add_run(t["k_komin"].format(s=n(pt["wynik"], 1))), 7.5, kolor=SZARY)
             p = k.add_paragraph()
             _odstepy(p, 0, 0)
             _styl_runu(p.add_run((t["k_zapas"] if pt["zgodny"] else t["k_brak"]).format(z=n(abs(pt["zapas"]), 1))), 7.5, kolor=ZIELONY if pt["zgodny"] else CZERWONY)
