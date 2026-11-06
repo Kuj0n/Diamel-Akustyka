@@ -619,7 +619,8 @@ function opisUdzialu(k) {
 }
 function opisGeoWydechu() {
   const k = W?.ok ? W.punkty[0]?.komin : null;
-  return k ? ` Punkt ${esc(P.points[0]?.name || '')}: wylot ${lp(k.wysokosc, 1)} m nad punktem, ${lp(k.r, 1)} m od punktu → wydech <b>${lp(k.wydech, 1)} dB(A)</b>, łącznie po stronie komina <b>${lp(k.wynik, 1)} dB(A)</b>.` : '';
+  const m1 = W?.ok && W.wydech_lpa_1m_suma ? ` Wydech 1 m od wylotu (za tłumikiem): <b>${lp(W.wydech_lpa_1m_suma, 1)} dB(A)</b>.` : '';
+  return m1 + (k ? ` Punkt ${esc(P.points[0]?.name || '')}: wylot ${lp(k.wysokosc, 1)} m nad punktem, ${lp(k.r, 1)} m od punktu → wydech <b>${lp(k.wydech, 1)} dB(A)</b>, łącznie po stronie komina <b>${lp(k.wynik, 1)} dB(A)</b>.` : '');
 }
 
 function wierszWarstwy(k, w, i, ile) {

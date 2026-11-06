@@ -253,6 +253,9 @@ def oblicz(p):
         "wydech_lw_a": wydech_lw_a, "wydech_lw_a_suma": suma_db(wydech_lw_a) if "wydech" in moduly else 0.0,
         "wydech_wpisane": wydech_wpisane, "wydech_lw": wydech_lw, "wydech_lp1m": lp_wydechu,
         "wydech_pusty": "wydech" in moduly and not any(wydech_wpisane),
+        # hałas wydechu 1 m od wylotu, za tłumikiem (jak "Reduced Sound Pressure Level: Lp at 1 m" w kartach tłumików), 1 komin
+        "wydech_lpa_1m": [wydech_lw_a[i] - moduly["wydech"]["r"][i] - LP_NA_LW for i in range(8)] if "wydech" in moduly else [0.0] * 8,
+        "wydech_lpa_1m_suma": suma_db([wydech_lw_a[i] - moduly["wydech"]["r"][i] for i in range(8)]) - LP_NA_LW if "wydech" in moduly and any(wydech_wpisane) else 0.0,
         "wydech_lw_a_po": [wydech_lw_a[i] - moduly["wydech"]["r"][i] for i in range(8)] if "wydech" in moduly else [0.0] * 8,
         "wydech_lw_a_po_suma": suma_db([wydech_lw_a[i] - moduly["wydech"]["r"][i] for i in range(8)]) if "wydech" in moduly and any(wydech_wpisane) else 0.0,
         "powierzchnie": s_mod, "moduly": moduly, "s_calkowita": s_calkowita, "s_kont": s_kont,

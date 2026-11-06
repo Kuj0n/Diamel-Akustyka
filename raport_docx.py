@@ -47,7 +47,7 @@ TEKSTY = {
         "zle_pkt": "przekroczenie w punktach: {p}", "dominuje": "Największy udział w hałasie: {m} ({p} %).",
         "rewizje": "Historia zmian dokumentu", "rev_h": ["Rew.", "Opis zmiany", "Wykonał", "Sprawdził", "Data"],
         "s1": "Cel analizy i dane wejściowe", "s2": "Źródło hałasu - widmo silnika", "s3": "Pochłanianie i poziom ciśnienia wewnątrz obudowy",
-        "s4": "Budowa obudowy - moduły i warstwy", "s5": "Chłodnica i wydech", "s6": "Wyniki w punktach pomiarowych", "s7": "Metoda obliczeń i założenia",
+        "s4": "Budowa obudowy - moduły i warstwy", "s5_chl": "Chłodnica", "s5_wyd": "Wydech silnika", "s6": "Wyniki w punktach pomiarowych", "s7": "Metoda obliczeń i założenia",
         "zal": "Załącznik",
         "cel": "Celem analizy jest określenie poziomu hałasu emitowanego przez agregat prądotwórczy w projektowanej obudowie i sprawdzenie wymagań akustycznych w wyznaczonych punktach pomiarowych. Pierwotnym źródłem jest hałas mechaniczny silnika; uwzględniono izolacyjność wszystkich przegród, czerpni i wyrzutu powietrza{dod}.",
         "cel_chl": ", hałas własny chłodnicy", "cel_wyd": ", wydech silnika",
@@ -65,10 +65,11 @@ TEKSTY = {
         "izol_tab": "Izolacyjność modułów w pasmach oktawowych [dB] (warstwy sumowane energetycznie)", "modul": "Moduł",
         "s_calk": "Całkowita powierzchnia promieniująca modułów: {s} m².",
         "chl": "Chłodnica na wyrzucie: {n}", "chl_lw": "Lw chłodnicy [{j}]", "chl_rdzen": "Tłumienie rdzenia [dB]", "chl_suma": "Moc akustyczna chłodnicy LwA",
-        "wyd": "Wydech silnika: {q} szt., wylot {k}{h}", "wyd_lw": "Lw wydechu [{j}]", "wyd_suma": "Moc akustyczna wydechu LwA (1 szt.)",
+        "wyd": "Liczba kominów: {q}, wylot {k}{h}", "wyd_lw": "Lw wydechu [{j}]", "wyd_suma": "Moc akustyczna wydechu LwA (1 szt.)",
         "pionowo": "pionowo w górę", "poziomo": "poziomo", "wysokosc": ", na wysokości {h} m",
         "wyd_lp": "Lp@1m od wylotu, bez tłumika [{j}]", "wyd_plus": "Przeliczenie na moc 10·lg(4π) [dB]", "wyd_lwj": "Lw wydechu [{j}]",
         "wyd_tl": "Tłumienie tłumika [dB]", "wyd_po": "LwA za tłumikiem [dB(A)]",
+        "wyd_1m_wiersz": "LpA 1 m od wylotu, za tłumikiem [dB(A)]", "wyd_1m": "Hałas wydechu 1 m od wylotu (za tłumikiem, 1 komin): {v} dB(A)",
         "wyd_geo": "Wylot {nd} m nad dachem obudowy (koniec komina / kolana), {os} m od najbliższej ściany; punkt pomiaru {wp} m nad terenem.",
         "komin": "Po stronie komina (wydech jako źródło punktowe): wylot {h} m nad punktem, odległość {r} m - wydech {wy} dB(A), łącznie z pozostałymi modułami {wk} dB(A). Średnio wokół obudowy (ISO 3744): {ws} dB(A). O ocenie punktu decyduje wyższy poziom.",
         "pkt_tytul": "Punkt {n} - odległość {d} m", "s_pom": "Powierzchnia pomiarowa ISO 3744 (dł.+2d × szer.+2d × wys.+d, bez podłogi)",
@@ -107,7 +108,7 @@ TEKSTY = {
         "zle_pkt": "exceeded at: {p}", "dominuje": "Largest contribution to the noise: {m} ({p} %).",
         "rewizje": "Document revision history", "rev_h": ["Rev.", "Description of change", "Drawn", "Checked", "Date"],
         "s1": "Scope and input data", "s2": "Noise source - engine spectrum", "s3": "Absorption and sound pressure inside the enclosure",
-        "s4": "Enclosure structure - modules and layers", "s5": "Radiator and exhaust", "s6": "Results at the measurement points", "s7": "Calculation method and assumptions",
+        "s4": "Enclosure structure - modules and layers", "s5_chl": "Radiator", "s5_wyd": "Engine exhaust", "s6": "Results at the measurement points", "s7": "Calculation method and assumptions",
         "zal": "Appendix",
         "cel": "The aim of the analysis is to determine the noise level emitted by the generating set in the designed enclosure and to verify the acoustic requirements at the designated measurement points. The primary source is the mechanical noise of the engine; the sound insulation of all partitions, the air intake and the air discharge is included{dod}.",
         "cel_chl": ", radiator self-noise", "cel_wyd": ", engine exhaust",
@@ -125,10 +126,11 @@ TEKSTY = {
         "izol_tab": "Sound insulation of the modules in octave bands [dB] (layers added energetically)", "modul": "Module",
         "s_calk": "Total radiating surface of the modules: {s} m².",
         "chl": "Radiator on the air discharge: {n}", "chl_lw": "Radiator Lw [{j}]", "chl_rdzen": "Core attenuation [dB]", "chl_suma": "Radiator sound power level LwA",
-        "wyd": "Engine exhaust: {q} pcs., outlet {k}{h}", "wyd_lw": "Exhaust Lw [{j}]", "wyd_suma": "Exhaust sound power level LwA (1 pc.)",
+        "wyd": "Number of stacks: {q}, outlet {k}{h}", "wyd_lw": "Exhaust Lw [{j}]", "wyd_suma": "Exhaust sound power level LwA (1 pc.)",
         "pionowo": "vertical (upwards)", "poziomo": "horizontal", "wysokosc": ", at {h} m height",
         "wyd_lp": "Lp@1m from the outlet, unsilenced [{j}]", "wyd_plus": "Conversion to sound power 10·lg(4π) [dB]", "wyd_lwj": "Exhaust Lw [{j}]",
         "wyd_tl": "Silencer attenuation [dB]", "wyd_po": "LwA after the silencer [dB(A)]",
+        "wyd_1m_wiersz": "LpA 1 m from the outlet, after the silencer [dB(A)]", "wyd_1m": "Engine exhaust noise 1 m from the outlet (after the silencer, 1 stack): {v} dB(A)",
         "wyd_geo": "Outlet {nd} m above the enclosure roof (end of the stack / elbow), {os} m from the nearest wall; measurement point {wp} m above ground.",
         "komin": "On the stack side (exhaust as a point source): outlet {h} m above the point, distance {r} m - exhaust {wy} dB(A), together with the other modules {wk} dB(A). Average around the enclosure (ISO 3744): {ws} dB(A). The higher level governs the assessment of the point.",
         "pkt_tytul": "Point {n} - distance {d} m", "s_pom": "ISO 3744 measurement surface (L+2d × W+2d × H+d, without floor)",
@@ -621,7 +623,7 @@ class Raport:
         self.tabela_pasm([(self.nazwa_modulu(k), m["r"], None) for k, m in w["moduly"].items()], t["modul"], suma=False)
         self.akapit(t["s_calk"].format(s=n(w["s_calkowita"])), 9, kolor=SZARY, przed=4)
 
-    def chlodnica_wydech(self):
+    def chlodnica(self):
         t, w, n, s = self.t, self.w, self.n, self.stan
         if w["chlodnica"]:
             rad = s.get("radiator") or {}
@@ -634,6 +636,9 @@ class Raport:
             self.tabela_pasm(wiersze)
             if self.obrazy.get("radiator"):
                 self.obraz(self.obrazy["radiator"])
+
+    def wydech(self):
+        t, w, n, s = self.t, self.w, self.n, self.stan
         if "wydech" in w["moduly"]:
             ak, md = s.get("acoustics") or {}, (s.get("mod_dims") or {}).get("wydech", {})
             dB = ak.get("jedn_wydechu", "dB") == "dB"
@@ -653,8 +658,11 @@ class Raport:
             if dB:
                 wiersze.append((t["korekta_a"], obliczenia.KOREKTA_A, None))
             wiersze += [(t["lwa"], w["wydech_lw_a"], w["wydech_lw_a_suma"]), (t["wyd_tl"], w["moduly"]["wydech"]["r"], None),
-                        (t["wyd_po"], w["wydech_lw_a_po"], w["wydech_lw_a_po_suma"])]
+                        (t["wyd_po"], w["wydech_lw_a_po"], w["wydech_lw_a_po_suma"]),
+                        (t["wyd_1m_wiersz"], w["wydech_lpa_1m"], w["wydech_lpa_1m_suma"])]
             self.tabela_pasm(wiersze)
+            if w["wydech_lpa_1m_suma"]:
+                self.ocena("info", t["wyd_1m"].format(v=n(w["wydech_lpa_1m_suma"], 1)))
 
     def wyniki(self):
         t, w, n = self.t, self.w, self.n
@@ -698,9 +706,13 @@ class Raport:
         self.sekcja(4, t["s4"], nowa_strona=True)
         self.budowa()
         nr = 5
-        if w["chlodnica"] or "wydech" in w["moduly"]:
-            self.sekcja(nr, t["s5"])
-            self.chlodnica_wydech()
+        if w["chlodnica"]:
+            self.sekcja(nr, t["s5_chl"])
+            self.chlodnica()
+            nr += 1
+        if "wydech" in w["moduly"]:
+            self.sekcja(nr, t["s5_wyd"])
+            self.wydech()
             nr += 1
         self.sekcja(nr, t["s6"], nowa_strona=True)
         self.wyniki()

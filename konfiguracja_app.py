@@ -4,11 +4,16 @@ import sys
 # ==========================================
 # KONFIGURACJA I METADANE
 # ==========================================
-VERSION = "2.0.4"
+VERSION = "2.0.5"
 DB_VERSION = "0"  # wersja bazy, gdy lokalny plik jej nie zawiera (baza z panelu diamel.pl ma numer wersji 1, 2, 3...)
-BUILD_DATE = "2026-11-06 16:00"
+BUILD_DATE = "2026-11-06 17:00"
 
 CHANGELOG = """
+v2.0.5 (2026-11-06)
+- Raport: osobne rozdziały Chłodnica i Wydech silnika (chłodnica tylko gdy włączona).
+- Wydech: hałas 1 m od wylotu za tłumikiem w dB(A) - jak w kartach tłumików (np. AXCES 85 dB(A)@1m) - w raporcie
+  (wiersz tabeli i wynik) oraz w zakładce Wydech.
+
 v2.0.4 (2026-11-06)
 - Wydech: na zakładce i przy module udział po stronie komina (wcześniej pokazywał 0% ze średniej wokół obudowy).
 - Kierunek wylotu: krótsze opisy przycisków (Poziomo / W górę) - nie są już ucinane.
